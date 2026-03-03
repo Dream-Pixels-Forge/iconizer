@@ -1,4 +1,4 @@
-import type { ProgressEvent } from '../types';
+import type { ProgressEvent } from './types';
 
 /**
  * Progress tracker for batch operations

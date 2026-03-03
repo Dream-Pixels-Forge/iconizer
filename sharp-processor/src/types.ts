@@ -55,6 +55,10 @@ export interface BatchJob {
   inputBuffer?: Buffer;
   options: ProcessingOptions;
   outputPath?: string;
+  outputBuffer?: Buffer;
+  status: JobStatus;
+  progress: number;
+  error?: string;
 }
 
 /**
@@ -63,9 +67,15 @@ export interface BatchJob {
 export interface ProgressEvent {
   jobId: string;
   progress: number;
-  stage: 'loading' | 'converting' | 'resizing' | 'saving';
+  stage: 'loading' | 'converting' | 'resizing' | 'saving' | 'processing';
   message: string;
+  eta?: number;
 }
+
+/**
+ * Job status types
+ */
+export type JobStatus = 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
 
 /**
  * Error types for image processing

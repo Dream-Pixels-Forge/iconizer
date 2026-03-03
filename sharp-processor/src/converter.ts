@@ -1,5 +1,5 @@
 import sharp, { type Metadata } from 'sharp';
-import type { ImageFormat, ProcessingOptions, ProcessingResult } from '../types';
+import type { ImageFormat, ProcessingOptions, ProcessingResult } from './types';
 
 /**
  * Map format names to Sharp format identifiers
@@ -100,14 +100,14 @@ export async function convertImage(
         pipeline = pipeline.raw();
         break;
       case 'gif':
-        pipeline = pipeline.gif();
-        break;
+        // GIF requires specific handling - skip for now
+        throw new Error('GIF output not yet implemented');
       case 'tiff':
         pipeline = pipeline.tiff(outputOptions);
         break;
       case 'svg':
-        pipeline = pipeline.svg();
-        break;
+        // SVG output requires vector input - skip for raster images
+        throw new Error('SVG output requires vector input');
       default:
         throw new Error(`Unsupported format: ${format}`);
     }

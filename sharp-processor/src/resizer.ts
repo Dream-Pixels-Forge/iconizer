@@ -1,5 +1,5 @@
 import sharp from 'sharp';
-import type { ImageSize, ProcessingResult } from '../types';
+import type { ImageSize, ProcessingResult } from './types';
 
 /**
  * Resize modes

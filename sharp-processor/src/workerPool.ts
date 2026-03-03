@@ -1,4 +1,4 @@
-import { type BatchJob } from '../types';
+import { type BatchJob } from './types';
 import { convertImage } from './converter';
 
 /**

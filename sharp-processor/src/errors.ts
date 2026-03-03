@@ -1,4 +1,4 @@
-import type { ProcessingError, ProcessingErrorType } from '../types';
+import type { ProcessingError, ProcessingErrorType } from './types';
 
 /**
  * Error message catalog

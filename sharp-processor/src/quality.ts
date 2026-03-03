@@ -1,4 +1,4 @@
-import type { ImageFormat } from '../types';
+import type { ImageFormat } from './types';
 
 /**
  * Quality presets

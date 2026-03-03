@@ -1,4 +1,4 @@
-import type { BatchJob, JobStatus } from '../types';
+import type { BatchJob, JobStatus } from './types';
 
 /**
  * Batch job queue with priority support
