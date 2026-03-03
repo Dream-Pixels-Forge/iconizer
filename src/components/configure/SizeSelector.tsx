@@ -1,0 +1,104 @@
+import React from 'react';
+import { Check, CheckCheck } from 'lucide-react';
+import { useConfigStore } from '../../stores/configStore';
+import { PRESET_SIZES, SIZE_CATEGORIES, getCategorySizes, QUICK_PRESETS } from '../../lib/presetSizes';
+import { Button } from '../ui/button';
+import { Checkbox } from '../ui/checkbox';
+import { Card, CardContent } from '../ui/card';
+import { cn } from '../../lib/utils';
+
+export default function SizeSelector() {
+  const { selectedSizes, toggleSize, selectAllSizes, deselectAllSizes, applyPreset } = useConfigStore();
+  const categories = getCategorySizes();
+
+  return (
+    <div className="space-y-4">
+      {/* Quick Presets */}
+      <div className="flex flex-wrap gap-2">
+        {Object.values(QUICK_PRESETS).map((preset) => (
+          <Button
+            key={preset.id}
+            variant="outline"
+            size="sm"
+            onClick={() => applyPreset(preset.id as keyof typeof QUICK_PRESETS)}
+            className="text-xs"
+          >
+            {preset.name}
+          </Button>
+        ))}
+      </div>
+
+      {/* Select All / Deselect All */}
+      <div className="flex items-center justify-between">
+        <span className="text-sm text-muted-foreground">
+          {selectedSizes.length} of {PRESET_SIZES.length} selected
+        </span>
+        <div className="flex gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={selectAllSizes}
+            className="h-8 text-xs"
+          >
+            <CheckCheck className="h-4 w-4 mr-1" />
+            Select All
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={deselectAllSizes}
+            className="h-8 text-xs"
+          >
+            Deselect All
+          </Button>
+        </div>
+      </div>
+
+      {/* Size Categories */}
+      <div className="space-y-4">
+        {Object.entries(categories).map(([category, sizes]) => (
+          <Card key={category}>
+            <CardContent className="p-4">
+              <div className="mb-3">
+                <h4 className="text-sm font-medium">
+                  {SIZE_CATEGORIES[category as keyof typeof SIZE_CATEGORIES].icon}{' '}
+                  {SIZE_CATEGORIES[category as keyof typeof SIZE_CATEGORIES].label}
+                </h4>
+                <p className="text-xs text-muted-foreground">
+                  {SIZE_CATEGORIES[category as keyof typeof SIZE_CATEGORIES].description}
+                </p>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {sizes.map((size) => {
+                  const isSelected = selectedSizes.includes(size.id);
+                  return (
+                    <label
+                      key={size.id}
+                      className={cn(
+                        'flex items-center space-x-2 p-2 rounded-md border cursor-pointer transition-colors',
+                        isSelected 
+                          ? 'border-primary bg-primary/5' 
+                          : 'border-input hover:bg-accent'
+                      )}
+                    >
+                      <Checkbox
+                        checked={isSelected}
+                        onCheckedChange={() => toggleSize(size.id)}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium">{size.name}</p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {size.description}
+                        </p>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
