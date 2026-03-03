@@ -55,7 +55,9 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
   }
   #root {
     @apply min-h-screen w-full;
@@ -90,7 +92,7 @@
 
 /* Drag and drop zone styles */
 .drop-zone {
-  @apply relative border-2 border-dashed rounded-lg transition-all duration-200;
+  @apply relative rounded-lg border-2 border-dashed transition-all duration-200;
   @apply border-muted-foreground/25 hover:border-primary/50;
   @apply flex flex-col items-center justify-center;
 }

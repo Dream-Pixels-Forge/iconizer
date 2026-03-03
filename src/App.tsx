@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Moon, Sun, Image as ImageIcon, Settings, Info } from 'lucide-react';
 import DropZone from './components/import/DropZone';
 import SizeSelector from './components/configure/SizeSelector';
@@ -6,7 +6,6 @@ import FormatSelector from './components/configure/FormatSelector';
 import OutputPanel from './components/output/OutputPanel';
 import SettingsPanel from './components/settings/SettingsPanel';
 import { useTheme } from './hooks/useTheme';
-import { cn } from './lib/utils';
 
 function App() {
   const { theme, setTheme } = useTheme();
@@ -21,33 +20,29 @@ function App() {
           <div className="flex items-center gap-2">
             <ImageIcon className="h-6 w-6 text-primary" />
             <h1 className="text-lg font-semibold">Iconizer</h1>
-            <span className="text-xs text-muted-foreground ml-2">v1.0.0-mvp</span>
+            <span className="ml-2 text-xs text-muted-foreground">v1.0.0-mvp</span>
           </div>
-          
+
           <div className="flex items-center gap-2">
             <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground h-9 w-9"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
               aria-label="Toggle theme"
             >
-              {theme === 'dark' ? (
-                <Sun className="h-5 w-5" />
-              ) : (
-                <Moon className="h-5 w-5" />
-              )}
+              {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
-            
+
             <button
               onClick={() => setShowAbout(true)}
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground h-9 w-9"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
               aria-label="About"
             >
               <Info className="h-5 w-5" />
             </button>
-            
+
             <button
               onClick={() => setShowSettings(true)}
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground h-9 px-4"
+              className="inline-flex h-9 items-center justify-center rounded-md px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
               aria-label="Settings"
             >
               <Settings className="h-5 w-5" />
@@ -61,9 +56,9 @@ function App() {
       <main className="container py-6">
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Left Column - Import & Preview */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="space-y-6 lg:col-span-1">
             <section aria-labelledby="import-heading">
-              <h2 id="import-heading" className="text-lg font-semibold mb-4">
+              <h2 id="import-heading" className="mb-4 text-lg font-semibold">
                 Import Images
               </h2>
               <DropZone />
@@ -71,16 +66,16 @@ function App() {
           </div>
 
           {/* Middle Column - Configuration */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="space-y-6 lg:col-span-1">
             <section aria-labelledby="sizes-heading">
-              <h2 id="sizes-heading" className="text-lg font-semibold mb-4">
+              <h2 id="sizes-heading" className="mb-4 text-lg font-semibold">
                 Select Sizes
               </h2>
               <SizeSelector />
             </section>
 
             <section aria-labelledby="formats-heading">
-              <h2 id="formats-heading" className="text-lg font-semibold mb-4">
+              <h2 id="formats-heading" className="mb-4 text-lg font-semibold">
                 Select Formats
               </h2>
               <FormatSelector />
@@ -88,9 +83,9 @@ function App() {
           </div>
 
           {/* Right Column - Output */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="space-y-6 lg:col-span-1">
             <section aria-labelledby="output-heading">
-              <h2 id="output-heading" className="text-lg font-semibold mb-4">
+              <h2 id="output-heading" className="mb-4 text-lg font-semibold">
                 Output
               </h2>
               <OutputPanel />
@@ -101,22 +96,16 @@ function App() {
 
       {/* Settings Panel */}
       {showSettings && (
-        <SettingsPanel 
-          onClose={() => setShowSettings(false)} 
-          showAbout={showAbout}
-          onAboutClose={() => setShowAbout(false)}
-        />
+        <SettingsPanel onClose={() => setShowSettings(false)} showAbout={showAbout} />
       )}
 
       {/* Footer */}
-      <footer className="border-t py-6 mt-auto">
+      <footer className="mt-auto border-t py-6">
         <div className="container flex flex-col items-center justify-between gap-4 md:flex-row">
           <p className="text-center text-sm text-muted-foreground">
             Built with Tauri, React, and Sharp
           </p>
-          <p className="text-center text-sm text-muted-foreground">
-            © 2026 Dream Pixels Forge
-          </p>
+          <p className="text-center text-sm text-muted-foreground">© 2026 Dream Pixels Forge</p>
         </div>
       </footer>
     </div>

@@ -1,14 +1,19 @@
-import React from 'react';
-import { Check, CheckCheck } from 'lucide-react';
+import { CheckCheck } from 'lucide-react';
 import { useConfigStore } from '../../stores/configStore';
-import { PRESET_SIZES, SIZE_CATEGORIES, getCategorySizes, QUICK_PRESETS } from '../../lib/presetSizes';
+import {
+  PRESET_SIZES,
+  SIZE_CATEGORIES,
+  getCategorySizes,
+  QUICK_PRESETS,
+} from '../../lib/presetSizes';
 import { Button } from '../ui/button';
 import { Checkbox } from '../ui/checkbox';
 import { Card, CardContent } from '../ui/card';
 import { cn } from '../../lib/utils';
 
 export default function SizeSelector() {
-  const { selectedSizes, toggleSize, selectAllSizes, deselectAllSizes, applyPreset } = useConfigStore();
+  const { selectedSizes, toggleSize, selectAllSizes, deselectAllSizes, applyPreset } =
+    useConfigStore();
   const categories = getCategorySizes();
 
   return (
@@ -34,21 +39,11 @@ export default function SizeSelector() {
           {selectedSizes.length} of {PRESET_SIZES.length} selected
         </span>
         <div className="flex gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={selectAllSizes}
-            className="h-8 text-xs"
-          >
-            <CheckCheck className="h-4 w-4 mr-1" />
+          <Button variant="ghost" size="sm" onClick={selectAllSizes} className="h-8 text-xs">
+            <CheckCheck className="mr-1 h-4 w-4" />
             Select All
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={deselectAllSizes}
-            className="h-8 text-xs"
-          >
+          <Button variant="ghost" size="sm" onClick={deselectAllSizes} className="h-8 text-xs">
             Deselect All
           </Button>
         </div>
@@ -75,21 +70,14 @@ export default function SizeSelector() {
                     <label
                       key={size.id}
                       className={cn(
-                        'flex items-center space-x-2 p-2 rounded-md border cursor-pointer transition-colors',
-                        isSelected 
-                          ? 'border-primary bg-primary/5' 
-                          : 'border-input hover:bg-accent'
+                        'flex cursor-pointer items-center space-x-2 rounded-md border p-2 transition-colors',
+                        isSelected ? 'border-primary bg-primary/5' : 'border-input hover:bg-accent'
                       )}
                     >
-                      <Checkbox
-                        checked={isSelected}
-                        onCheckedChange={() => toggleSize(size.id)}
-                      />
-                      <div className="flex-1 min-w-0">
+                      <Checkbox checked={isSelected} onCheckedChange={() => toggleSize(size.id)} />
+                      <div className="min-w-0 flex-1">
                         <p className="text-sm font-medium">{size.name}</p>
-                        <p className="text-xs text-muted-foreground truncate">
-                          {size.description}
-                        </p>
+                        <p className="truncate text-xs text-muted-foreground">{size.description}</p>
                       </div>
                     </label>
                   );

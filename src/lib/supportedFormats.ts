@@ -64,7 +64,7 @@ export const INPUT_FORMATS: ImageFormat[] = [
  * Get format by ID
  */
 export function getFormatById(id: string): OutputFormat | undefined {
-  return SUPPORTED_FORMATS.find(format => format.id === id.toLowerCase());
+  return SUPPORTED_FORMATS.find((format) => format.id === id.toLowerCase());
 }
 
 /**
@@ -90,8 +90,8 @@ export function getRecommendedFormat(useCase: string): ImageFormat {
   const recommendations: Record<string, ImageFormat> = {
     'web-icon': 'png',
     'app-icon': 'png',
-    'photo': 'jpg',
-    'transparent': 'png',
+    photo: 'jpg',
+    transparent: 'png',
     'windows-icon': 'ico',
     'small-file': 'webp',
   };
