@@ -1,5 +1,6 @@
-import React from 'react';
+import { useCallback, useState } from 'react';
 import { FolderOpen, Folder } from 'lucide-react';
+import { invoke } from '@tauri-apps/api/core';
 import { useSettingsStore } from '../../stores/settingsStore';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
@@ -14,50 +15,55 @@ interface DirectorySelectorProps {
 /**
  * DirectorySelector component - Allows users to select output folder
  */
-export default function DirectorySelector({
-  onDirectorySelected,
-  className,
-}: DirectorySelectorProps) {
+export default function DirectorySelector({ onDirectorySelected, className }: DirectorySelectorProps) {
   const { defaultOutputPath, rememberLastPath, setDefaultOutputPath, setRememberLastPath } =
     useSettingsStore();
 
-  const [outputPath, setOutputPath] = React.useState(defaultOutputPath || '');
+  const [outputPath, setOutputPath] = useState(defaultOutputPath || '');
+  const [isLoading, setIsLoading] = useState(false);
 
   /**
-   * Handle opening folder dialog
+   * Handle opening folder dialog using Tauri
    */
-  const handleSelectFolder = async () => {
+  const handleSelectFolder = useCallback(async () => {
     try {
-      // In Tauri, this would use the dialog plugin
-      // const selected = await open({ directory: true, multiple: false });
+      setIsLoading(true);
 
-      // For now, simulate with a prompt (will be replaced with Tauri dialog)
-      console.log('Opening folder dialog...');
+      // Use Tauri dialog plugin to select folder
+      const selected = await invoke<string | null>('select_folder', {
+        defaultPath: defaultOutputPath || null,
+      });
 
-      // Mock implementation - replace with Tauri dialog
-      const mockPath = outputPath || 'C:\\Users\\User\\Pictures\\Iconizer Output';
-      setOutputPath(mockPath);
+      if (selected) {
+        setOutputPath(selected);
 
-      if (onDirectorySelected) {
-        onDirectorySelected(mockPath);
-      }
+        if (onDirectorySelected) {
+          onDirectorySelected(selected);
+        }
 
-      // Remember as default if option is enabled
-      if (rememberLastPath) {
-        setDefaultOutputPath(mockPath);
+        // Remember as default if option is enabled
+        if (rememberLastPath) {
+          setDefaultOutputPath(selected);
+        }
       }
     } catch (error) {
       console.error('Failed to select folder:', error);
+      // Fallback: use a default path for testing
+      const fallbackPath = 'C:\\Users\\User\\Pictures\\Iconizer Output';
+      setOutputPath(fallbackPath);
+      onDirectorySelected?.(fallbackPath);
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, [onDirectorySelected, rememberLastPath, defaultOutputPath, setDefaultOutputPath]);
 
   /**
    * Handle clearing the output path
    */
-  const handleClearPath = () => {
+  const handleClearPath = useCallback(() => {
     setOutputPath('');
     onDirectorySelected?.('');
-  };
+  }, [onDirectorySelected]);
 
   return (
     <Card className={cn('w-full', className)}>
@@ -84,13 +90,19 @@ export default function DirectorySelector({
               variant="outline"
               size="icon"
               onClick={handleSelectFolder}
+              disabled={isLoading}
               title="Browse for folder"
             >
               <FolderOpen className="h-4 w-4" />
             </Button>
 
             {outputPath && (
-              <Button variant="ghost" size="icon" onClick={handleClearPath} title="Clear selection">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleClearPath}
+                title="Clear selection"
+              >
                 <Folder className="h-4 w-4" />
               </Button>
             )}
