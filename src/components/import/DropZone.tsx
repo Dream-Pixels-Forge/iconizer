@@ -70,7 +70,9 @@ export default function DropZone() {
         const metadata = await Promise.all(metadataPromises);
         addImages(metadata);
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to process files';
         console.error('Failed to process files:', error);
+        useImportStore.getState().setError(errorMessage);
       } finally {
         setIsLoading(false);
       }
@@ -78,18 +80,15 @@ export default function DropZone() {
     [addImages]
   );
 
-  const handleDrop = useCallback(
-    async (e: React.DragEvent) => {
-      e.preventDefault();
-      setIsDragOver(false);
-    },
-    []
-  );
+  const handleDrop = useCallback(async (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  }, []);
 
   const handleBrowse = useCallback(async () => {
     try {
       setIsLoading(true);
-      
+
       const paths = await invoke<string[]>('select_files', {
         filters: ['png', 'jpg', 'jpeg', 'webp', 'ico', 'bmp', 'gif', 'tiff', 'svg'],
       });
@@ -127,10 +126,14 @@ export default function DropZone() {
           {isDragOver ? 'Drop images here' : 'Drag & drop images'}
         </h3>
         <p className="mb-4 text-sm text-muted-foreground">or click to browse</p>
-        <Button type="button" disabled={isLoading} onClick={(e) => {
-          e.stopPropagation();
-          handleBrowse();
-        }}>
+        <Button
+          type="button"
+          disabled={isLoading}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleBrowse();
+          }}
+        >
           {isLoading ? 'Loading...' : 'Browse Files'}
         </Button>
       </div>
@@ -149,9 +152,9 @@ export default function DropZone() {
             </Button>
           </div>
           <div className="grid gap-2">
-            {images.map((image, index) => (
+            {images.map((image) => (
               <div
-                key={`${image.name}-${index}`}
+                key={image.path}
                 className="flex items-center justify-between rounded-md border bg-card p-3"
               >
                 <div className="flex items-center gap-3">

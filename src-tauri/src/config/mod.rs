@@ -1,3 +1,2 @@
 // Configuration management module
-
-pub mod persistence;
+// Note: Core functionality is in commands/config.rs

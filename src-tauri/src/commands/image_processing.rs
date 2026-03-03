@@ -1,8 +1,31 @@
 use serde::{Deserialize, Serialize};
 use tauri::command;
 use image::{DynamicImage, GenericImageView, ImageFormat};
-use std::path::Path;
+use std::path::{Path, Component};
 use tokio::task::spawn_blocking;
+
+/// Sanitize filename to prevent path traversal and invalid characters
+fn sanitize_filename(name: &str) -> String {
+    name.chars()
+        .map(|c| {
+            if c.is_alphanumeric() || c == '-' || c == '_' || c == '.' {
+                c
+            } else {
+                '_'
+            }
+        })
+        .collect()
+}
+
+/// Validate that output path is safe (doesn't escape output directory)
+fn is_path_safe(output_dir: &Path, full_path: &Path) -> bool {
+    match full_path.strip_prefix(output_dir) {
+        Ok(relative) => {
+            !relative.components().any(|c| c == Component::ParentDir)
+        }
+        Err(_) => false,
+    }
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ImageMetadata {
@@ -234,12 +257,20 @@ pub async fn batch_convert(request: BatchConversionRequest) -> Result<BatchConve
             // Process each format
             for format in &request.target_formats {
                 let size_str = format!("{}x{}", width, height);
-                
+
+                // Sanitize source filename to prevent path traversal
+                let source_name = Path::new(source_path)
+                    .file_stem()
+                    .unwrap_or_default()
+                    .to_str()
+                    .unwrap_or("image");
+                let sanitized_name = sanitize_filename(source_name);
+
                 // Generate output filename based on pattern
                 let file_name = request.naming_pattern
-                    .replace("{name}", Path::new(source_path).file_stem().unwrap_or_default().to_str().unwrap_or("image"))
+                    .replace("{name}", &sanitized_name)
                     .replace("{size}", &size_str)
-                    .replace("{format}", format)
+                    .replace("{format}", &sanitize_filename(format))
                     .replace("{width}", &width.to_string())
                     .replace("{height}", &height.to_string());
 
@@ -250,6 +281,21 @@ pub async fn batch_convert(request: BatchConversionRequest) -> Result<BatchConve
                     "by-size-and-format" => format!("{}/{}/{}/{}", request.output_directory, size_str, format, file_name),
                     _ => format!("{}/{}", request.output_directory, file_name),
                 };
+
+                // Validate output path doesn't escape output directory
+                let output_path_obj = Path::new(&output_path);
+                let output_dir_obj = Path::new(&request.output_directory);
+                if !is_path_safe(output_dir_obj, output_path_obj) {
+                    failed += 1;
+                    results.push(ConversionResult {
+                        success: false,
+                        output_path: None,
+                        width: None,
+                        height: None,
+                        error: Some("Invalid output path".to_string()),
+                    });
+                    continue;
+                }
 
                 let convert_request = ConversionRequest {
                     source_path: source_path.clone(),

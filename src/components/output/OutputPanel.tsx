@@ -140,18 +140,14 @@ export default function OutputPanel() {
             <h4 className="mb-2 text-sm font-medium">Conversion Complete</h4>
             <div className="flex items-center gap-4">
               <div className="text-sm">
-                <span className="text-green-600 font-medium">
+                <span className="font-medium text-green-600">
                   {conversionResult.successful} successful
                 </span>
                 {conversionResult.failed > 0 && (
-                  <span className="text-red-600 ml-2">
-                    {conversionResult.failed} failed
-                  </span>
+                  <span className="ml-2 text-red-600">{conversionResult.failed} failed</span>
                 )}
               </div>
-              <span className="text-muted-foreground">
-                of {conversionResult.total} total
-              </span>
+              <span className="text-muted-foreground">of {conversionResult.total} total</span>
             </div>
           </CardContent>
         </Card>
@@ -191,9 +187,7 @@ export default function OutputPanel() {
       )}
 
       {images.length === 0 && (
-        <p className="text-center text-xs text-muted-foreground">
-          Import images to convert
-        </p>
+        <p className="text-center text-xs text-muted-foreground">Import images to convert</p>
       )}
     </div>
   );

@@ -15,7 +15,10 @@ interface DirectorySelectorProps {
 /**
  * DirectorySelector component - Allows users to select output folder
  */
-export default function DirectorySelector({ onDirectorySelected, className }: DirectorySelectorProps) {
+export default function DirectorySelector({
+  onDirectorySelected,
+  className,
+}: DirectorySelectorProps) {
   const { defaultOutputPath, rememberLastPath, setDefaultOutputPath, setRememberLastPath } =
     useSettingsStore();
 
@@ -97,12 +100,7 @@ export default function DirectorySelector({ onDirectorySelected, className }: Di
             </Button>
 
             {outputPath && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleClearPath}
-                title="Clear selection"
-              >
+              <Button variant="ghost" size="icon" onClick={handleClearPath} title="Clear selection">
                 <Folder className="h-4 w-4" />
               </Button>
             )}

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { ConversionConfig, ImageFormat } from '../types';
-import { QUICK_PRESETS } from '../lib/presetSizes';
+import { QUICK_PRESETS, PRESET_SIZES } from '../lib/presetSizes';
 
 interface ConfigState extends ConversionConfig {
   // Actions
@@ -41,12 +41,7 @@ export const useConfigStore = create<ConfigState>((set) => ({
       };
     }),
 
-  selectAllSizes: () => {
-    // Import dynamically to avoid circular dependency
-    import('../lib/presetSizes').then(({ PRESET_SIZES }) => {
-      set({ selectedSizes: PRESET_SIZES.map((s) => s.id) });
-    });
-  },
+  selectAllSizes: () => set({ selectedSizes: PRESET_SIZES.map((s) => s.id) }),
 
   deselectAllSizes: () => set({ selectedSizes: [] }),
 
