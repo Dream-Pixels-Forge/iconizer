@@ -1,6 +1,3 @@
 // Image processing module
 // This module handles all image manipulation operations
-
-pub mod converter;
-pub mod resizer;
-pub mod batch;
+// Note: Core functionality is in commands/image_processing.rs

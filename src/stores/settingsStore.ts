@@ -25,19 +25,19 @@ export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
       ...defaultSettings,
-      
+
       setTheme: (theme) => set({ theme }),
-      
+
       setDefaultOutputPath: (path) => set({ defaultOutputPath: path }),
-      
+
       setDefaultOrganization: (organization) => set({ defaultOrganization: organization }),
-      
+
       setRememberLastPath: (value) => set({ rememberLastPath: value }),
-      
+
       setOpenFolderAfterCompletion: (value) => set({ openFolderAfterCompletion: value }),
-      
+
       setMaxConcurrentJobs: (value) => set({ maxConcurrentJobs: value }),
-      
+
       resetToDefaults: () => set(defaultSettings),
     }),
     {

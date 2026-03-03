@@ -1,102 +1,164 @@
-import React, { useState } from 'react';
-import { FolderOpen, Settings, Play } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import { Play } from 'lucide-react';
+import { invoke } from '@tauri-apps/api/core';
+import { useConfigStore } from '../../stores/configStore';
+import { useImportStore } from '../../stores/importStore';
 import { useSettingsStore } from '../../stores/settingsStore';
+import DirectorySelector from './DirectorySelector';
+import NamingConvention from './NamingConvention';
+import OrganizationSelector from './OrganizationSelector';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
-import { cn } from '../../lib/utils';
+import type { OrganizationType } from './OrganizationSelector';
 
 export default function OutputPanel() {
-  const { defaultOutputPath, defaultOrganization } = useSettingsStore();
-  const [outputPath, setOutputPath] = useState(defaultOutputPath || '');
+  const { selectedSizes, selectedFormats, quality } = useConfigStore();
+  const { images } = useImportStore();
+  const { defaultOrganization } = useSettingsStore();
+
+  const [outputPath, setOutputPath] = useState('');
+  const [organization, setOrganization] = useState<OrganizationType>(defaultOrganization);
+  const [namingPattern, setNamingPattern] = useState('{name}-{size}.{format}');
   const [isConverting, setIsConverting] = useState(false);
+  const [conversionResult, setConversionResult] = useState<{
+    total: number;
+    successful: number;
+    failed: number;
+  } | null>(null);
 
-  const handleSelectFolder = async () => {
-    // In Tauri, this would use the dialog plugin
-    console.log('Opening folder dialog...');
-  };
+  const totalOutputs = selectedSizes.length * selectedFormats.length;
 
-  const handleConvert = async () => {
+  const handleConvert = useCallback(async () => {
+    if (!outputPath || totalOutputs === 0 || images.length === 0) return;
+
     setIsConverting(true);
-    // In Tauri, this would invoke the conversion command
-    console.log('Starting conversion...');
-    setTimeout(() => setIsConverting(false), 2000);
-  };
+    setConversionResult(null);
+
+    try {
+      // Parse sizes to width/height pairs
+      const sizes = selectedSizes.map((sizeStr) => {
+        const [width, height] = sizeStr.split('x').map((n) => parseInt(n, 10));
+        return [width, height] as [number, number];
+      });
+
+      // Prepare batch conversion request
+      const result = await invoke<{
+        total: number;
+        successful: number;
+        failed: number;
+        results: Array<{ success: boolean; output_path?: string; error?: string }>;
+      }>('batch_convert', {
+        request: {
+          sourcePaths: images.map((img) => img.path),
+          outputDirectory: outputPath,
+          targetFormats: selectedFormats,
+          sizes: sizes,
+          quality: quality,
+          organization: organization,
+          namingPattern: namingPattern,
+        },
+      });
+
+      setConversionResult({
+        total: result.total,
+        successful: result.successful,
+        failed: result.failed,
+      });
+
+      // Open folder after conversion if enabled
+      if (result.successful > 0) {
+        const settings = useSettingsStore.getState();
+        if (settings.openFolderAfterCompletion) {
+          try {
+            await invoke('open_folder', { path: outputPath });
+          } catch (openError) {
+            console.error('Failed to open folder:', openError);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Conversion failed:', error);
+      setConversionResult({
+        total: totalOutputs * images.length,
+        successful: 0,
+        failed: totalOutputs * images.length,
+      });
+    } finally {
+      setIsConverting(false);
+    }
+  }, [
+    outputPath,
+    totalOutputs,
+    images,
+    selectedSizes,
+    selectedFormats,
+    quality,
+    organization,
+    namingPattern,
+  ]);
+
+  const canConvert = outputPath && totalOutputs > 0 && images.length > 0 && !isConverting;
 
   return (
     <div className="space-y-4">
-      {/* Output Location */}
-      <Card>
-        <CardContent className="p-4 space-y-3">
-          <div>
-            <h4 className="text-sm font-medium mb-2">Output Location</h4>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={outputPath}
-                onChange={(e) => setOutputPath(e.target.value)}
-                placeholder="Select output folder..."
-                className="flex-1 h-10 px-3 rounded-md border border-input bg-background text-sm"
-                readOnly
-              />
-              <Button variant="outline" size="icon" onClick={handleSelectFolder}>
-                <FolderOpen className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+      {/* Output Configuration */}
+      <DirectorySelector onDirectorySelected={setOutputPath} />
 
-          <div>
-            <h4 className="text-sm font-medium mb-2">Organization</h4>
-            <select
-              defaultValue={defaultOrganization}
-              className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
-            >
-              <option value="flat">Flat (all files in one folder)</option>
-              <option value="by-size">Organize by Size</option>
-              <option value="by-format">Organize by Format</option>
-              <option value="by-size-and-format">Organize by Size & Format</option>
-            </select>
-          </div>
+      <OrganizationSelector onOrganizationChange={setOrganization} />
 
-          <div>
-            <h4 className="text-sm font-medium mb-2">Naming Pattern</h4>
-            <input
-              type="text"
-              defaultValue="{name}-{size}.{format}"
-              className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm font-mono"
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              Variables: {'{name}'}, {'{size}'}, {'{format}'}, {'{width}'}, {'{height}'}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      <NamingConvention onPatternChange={setNamingPattern} />
 
       {/* Summary */}
       <Card>
         <CardContent className="p-4">
-          <h4 className="text-sm font-medium mb-3">Summary</h4>
+          <h4 className="mb-3 text-sm font-medium">Summary</h4>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
+              <span className="text-muted-foreground">Source Images</span>
+              <span>{images.length}</span>
+            </div>
+            <div className="flex justify-between">
               <span className="text-muted-foreground">Selected Sizes</span>
-              <span>7</span>
+              <span>{selectedSizes.length}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Selected Formats</span>
-              <span>2</span>
+              <span>{selectedFormats.length}</span>
             </div>
-            <div className="flex justify-between font-medium pt-2 border-t">
+            <div className="flex justify-between border-t pt-2 font-medium">
               <span>Total Outputs</span>
-              <span>14 files</span>
+              <span>{totalOutputs * images.length} files</span>
             </div>
           </div>
         </CardContent>
       </Card>
 
+      {/* Conversion Result */}
+      {conversionResult && (
+        <Card>
+          <CardContent className="p-4">
+            <h4 className="mb-2 text-sm font-medium">Conversion Complete</h4>
+            <div className="flex items-center gap-4">
+              <div className="text-sm">
+                <span className="font-medium text-green-600">
+                  {conversionResult.successful} successful
+                </span>
+                {conversionResult.failed > 0 && (
+                  <span className="ml-2 text-red-600">{conversionResult.failed} failed</span>
+                )}
+              </div>
+              <span className="text-muted-foreground">of {conversionResult.total} total</span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Convert Button */}
       <Button
-        className="w-full h-12 text-base"
+        className="h-12 w-full text-base"
         onClick={handleConvert}
-        disabled={isConverting || !outputPath}
+        disabled={!canConvert}
+        size="lg"
       >
         {isConverting ? (
           <span className="flex items-center gap-2">
@@ -110,6 +172,23 @@ export default function OutputPanel() {
           </span>
         )}
       </Button>
+
+      {/* Helper Text */}
+      {!outputPath && (
+        <p className="text-center text-xs text-muted-foreground">
+          Select an output folder to begin
+        </p>
+      )}
+
+      {totalOutputs === 0 && (
+        <p className="text-center text-xs text-muted-foreground">
+          Select at least one size and format
+        </p>
+      )}
+
+      {images.length === 0 && (
+        <p className="text-center text-xs text-muted-foreground">Import images to convert</p>
+      )}
     </div>
   );
 }

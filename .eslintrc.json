@@ -1,5 +1,4 @@
 {
-  "$schema": "https://json.schemastore.org/eslintrc",
   "root": true,
   "env": {
     "browser": true,
@@ -10,8 +9,7 @@
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
-    "plugin:react-hooks/recommended",
-    "plugin:react-refresh/recommended"
+    "plugin:react-hooks/recommended"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -24,8 +22,7 @@
   "plugins": [
     "@typescript-eslint",
     "react",
-    "react-hooks",
-    "react-refresh"
+    "react-hooks"
   ],
   "rules": {
     "react/react-in-jsx-scope": "off",
@@ -37,11 +34,7 @@
         "varsIgnorePattern": "^_"
       }
     ],
-    "@typescript-eslint/no-explicit-any": "warn",
-    "react-refresh/only-export-components": [
-      "warn",
-      { "allowConstantExport": true }
-    ]
+    "@typescript-eslint/no-explicit-any": "warn"
   },
   "settings": {
     "react": {
@@ -53,6 +46,7 @@
     "src-tauri",
     "node_modules",
     "*.config.js",
-    "*.config.ts"
+    "*.config.ts",
+    "sharp-processor"
   ]
 }

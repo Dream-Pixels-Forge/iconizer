@@ -1,5 +1,6 @@
 use tauri::command;
 use serde::{Deserialize, Serialize};
+use tauri_plugin_dialog::DialogExt;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FolderSelectionResult {
@@ -10,19 +11,54 @@ pub struct FolderSelectionResult {
 /// Open folder selection dialog
 #[command]
 pub async fn select_folder(default_path: Option<String>) -> Result<FolderSelectionResult, String> {
-    // TODO: Implement actual folder dialog using tauri-plugin-dialog
-    Ok(FolderSelectionResult {
-        path: default_path.or_else(|| Some("C:\\Users\\User\\Pictures".to_string())),
-        cancelled: false,
-    })
+    let app_handle = tauri::AppHandle::get_current().ok_or("App handle not available")?;
+
+    let folder = app_handle
+        .dialog()
+        .file()
+        .pick_folder();
+
+    match folder {
+        Some(path) => Ok(FolderSelectionResult {
+            path: Some(path.to_string()),
+            cancelled: false,
+        }),
+        None => Ok(FolderSelectionResult {
+            path: None,
+            cancelled: true,
+        }),
+    }
 }
 
-/// Open file selection dialog
+/// Open file selection dialog for images
+/// Returns array of file paths directly
 #[command]
-pub async fn select_file(filters: Option<Vec<String>>) -> Result<FolderSelectionResult, String> {
-    // TODO: Implement actual file dialog
-    Ok(FolderSelectionResult {
-        path: None,
-        cancelled: true,
-    })
+pub async fn select_files(filters: Option<Vec<String>>) -> Result<Vec<String>, String> {
+    let app_handle = tauri::AppHandle::get_current().ok_or("App handle not available")?;
+
+    let files = app_handle
+        .dialog()
+        .file()
+        .add_filter("Images", &filters.unwrap_or_else(|| vec![
+            "png".to_string(),
+            "jpg".to_string(),
+            "jpeg".to_string(),
+            "webp".to_string(),
+            "bmp".to_string(),
+            "gif".to_string(),
+            "tiff".to_string(),
+            "svg".to_string(),
+        ]))
+        .pick_files();
+
+    let paths: Vec<String> = files
+        .into_iter()
+        .map(|p| p.to_string())
+        .collect();
+
+    if paths.is_empty() {
+        return Err("No files selected".to_string());
+    }
+
+    Ok(paths)
 }

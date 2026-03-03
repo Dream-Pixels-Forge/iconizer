@@ -29,7 +29,7 @@ export const PRESET_SIZES: PresetSize[] = [
     description: 'Taskbar icon',
     category: 'favicon',
   },
-  
+
   // Icon sizes
   {
     id: '48x48',
@@ -63,7 +63,7 @@ export const PRESET_SIZES: PresetSize[] = [
     description: 'macOS small icon',
     category: 'icon',
   },
-  
+
   // App sizes
   {
     id: '256x256',
@@ -148,7 +148,7 @@ export const QUICK_PRESETS = {
     id: 'all',
     name: 'All Sizes',
     description: 'Generate all preset sizes',
-    sizes: PRESET_SIZES.map(s => s.id),
+    sizes: PRESET_SIZES.map((s) => s.id),
   },
 } as const;
 
@@ -156,14 +156,14 @@ export const QUICK_PRESETS = {
  * Get sizes by category
  */
 export function getSizesByCategory(category: keyof typeof SIZE_CATEGORIES): PresetSize[] {
-  return PRESET_SIZES.filter(size => size.category === category);
+  return PRESET_SIZES.filter((size) => size.category === category);
 }
 
 /**
  * Get size by ID
  */
 export function getSizeById(id: string): PresetSize | undefined {
-  return PRESET_SIZES.find(size => size.id === id);
+  return PRESET_SIZES.find((size) => size.id === id);
 }
 
 /**
@@ -171,13 +171,13 @@ export function getSizeById(id: string): PresetSize | undefined {
  */
 export function getCategorySizes(): Record<string, PresetSize[]> {
   const categories: Record<string, PresetSize[]> = {};
-  
+
   for (const size of PRESET_SIZES) {
     if (!categories[size.category]) {
       categories[size.category] = [];
     }
     categories[size.category].push(size);
   }
-  
+
   return categories;
 }

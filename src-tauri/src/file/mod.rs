@@ -1,4 +1,2 @@
 // File operations module
-
-pub mod validator;
-pub mod organizer;
+// Note: Core functionality is in commands/file_dialog.rs and commands/file_operations.rs

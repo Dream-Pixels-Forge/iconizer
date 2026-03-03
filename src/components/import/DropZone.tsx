@@ -1,13 +1,15 @@
-import React, { useCallback, useState } from 'react';
-import { Upload, FileImage, X } from 'lucide-react';
+import { useCallback, useState } from 'react';
+import { FileImage, X } from 'lucide-react';
+import { invoke } from '@tauri-apps/api/core';
 import { useImportStore } from '../../stores/importStore';
 import { Button } from '../ui/button';
 import { cn } from '../../lib/utils';
-import type { ImageMetadata } from '../../types';
+import type { ImageMetadata, ImageFormat } from '../../types';
 
 export default function DropZone() {
   const { addImages, removeImage, images } = useImportStore();
   const [isDragOver, setIsDragOver] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -19,47 +21,91 @@ export default function DropZone() {
     setIsDragOver(false);
   }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
+  const processFiles = useCallback(
+    async (filePaths: string[]) => {
+      if (filePaths.length === 0) return;
+
+      setIsLoading(true);
+
+      try {
+        // Get metadata for each file using Tauri backend
+        const metadataPromises = filePaths.map(async (path) => {
+          try {
+            const metadata = await invoke<{
+              name: string;
+              path: string;
+              format: string;
+              width: number;
+              height: number;
+              size: number;
+              has_transparency: boolean;
+            }>('get_image_metadata', { path });
+
+            return {
+              name: metadata.name,
+              path: metadata.path,
+              format: metadata.format as ImageFormat,
+              width: metadata.width,
+              height: metadata.height,
+              size: metadata.size,
+              hasTransparency: metadata.has_transparency,
+            } as ImageMetadata;
+          } catch (error) {
+            console.error('Failed to get metadata for:', path, error);
+            // Fallback: create basic metadata from path
+            const fileName = path.split(/[\\/]/).pop() || 'unknown';
+            const ext = fileName.split('.').pop()?.toLowerCase() || 'png';
+            return {
+              name: fileName,
+              path,
+              format: ext as ImageFormat,
+              width: 0,
+              height: 0,
+              size: 0,
+              hasTransparency: false,
+            } as ImageMetadata;
+          }
+        });
+
+        const metadata = await Promise.all(metadataPromises);
+        addImages(metadata);
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to process files';
+        console.error('Failed to process files:', error);
+        useImportStore.getState().setError(errorMessage);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [addImages]
+  );
+
+  const handleDrop = useCallback(async (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
+  }, []);
 
-    const files = Array.from(e.dataTransfer.files);
-    const imageFiles = files.filter(file => 
-      file.type.startsWith('image/')
-    );
+  const handleBrowse = useCallback(async () => {
+    try {
+      setIsLoading(true);
 
-    const metadata: ImageMetadata[] = imageFiles.map(file => ({
-      name: file.name,
-      path: file.name, // In Tauri, this would be the actual path
-      format: file.type.split('/')[1] as any,
-      width: 0, // Would be populated by reading the image
-      height: 0,
-      size: file.size,
-      hasTransparency: false,
-    }));
+      const paths = await invoke<string[]>('select_files', {
+        filters: ['png', 'jpg', 'jpeg', 'webp', 'ico', 'bmp', 'gif', 'tiff', 'svg'],
+      });
 
-    addImages(metadata);
-  }, [addImages]);
-
-  const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    const imageFiles = files.filter(file => 
-      file.type.startsWith('image/')
-    );
-
-    const metadata: ImageMetadata[] = imageFiles.map(file => ({
-      name: file.name,
-      path: file.name,
-      format: file.type.split('/')[1] as any,
-      width: 0,
-      height: 0,
-      size: file.size,
-      hasTransparency: false,
-    }));
-
-    addImages(metadata);
-    e.target.value = ''; // Reset input
-  }, [addImages]);
+      if (paths && paths.length > 0) {
+        await processFiles(paths);
+      }
+    } catch (error) {
+      console.error('Failed to select files:', error);
+      // Don't show error if user cancelled
+      if (error && typeof error === 'string' && !error.includes('No files selected')) {
+        alert(`Failed to select files: ${error}`);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, [processFiles]);
 
   return (
     <div className="space-y-4">
@@ -68,43 +114,48 @@ export default function DropZone() {
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={cn(
-          'drop-zone min-h-[200px] p-8',
-          isDragOver && 'active'
+          'flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 transition-colors',
+          'hover:bg-accent hover:text-accent-foreground',
+          isDragOver && 'border-primary bg-accent/50',
+          'min-h-[200px]'
         )}
+        onClick={handleBrowse}
       >
-        <div className="text-center">
-          <FileImage className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium mb-2">
-            {isDragOver ? 'Drop images here' : 'Drag & drop images'}
-          </h3>
-          <p className="text-sm text-muted-foreground mb-4">
-            or click to browse
-          </p>
-          <label>
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleFileInput}
-              className="hidden"
-            />
-            <Button asChild>
-              <span>Browse Files</span>
-            </Button>
-          </label>
-        </div>
+        <FileImage className="mb-4 h-12 w-12 text-muted-foreground" />
+        <h3 className="mb-2 text-lg font-medium">
+          {isDragOver ? 'Drop images here' : 'Drag & drop images'}
+        </h3>
+        <p className="mb-4 text-sm text-muted-foreground">or click to browse</p>
+        <Button
+          type="button"
+          disabled={isLoading}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleBrowse();
+          }}
+        >
+          {isLoading ? 'Loading...' : 'Browse Files'}
+        </Button>
       </div>
 
       {images.length > 0 && (
         <div className="space-y-2">
-          <h4 className="text-sm font-medium">
-            Selected Images ({images.length})
-          </h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-medium">Selected Images ({images.length})</h4>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => useImportStore.getState().clearAll()}
+              className="text-xs"
+            >
+              Clear All
+            </Button>
+          </div>
           <div className="grid gap-2">
-            {images.map((image, index) => (
+            {images.map((image) => (
               <div
-                key={index}
-                className="flex items-center justify-between p-3 rounded-md border bg-card"
+                key={image.path}
+                className="flex items-center justify-between rounded-md border bg-card p-3"
               >
                 <div className="flex items-center gap-3">
                   <FileImage className="h-5 w-5 text-muted-foreground" />

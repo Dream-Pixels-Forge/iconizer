@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { ConversionConfig, ImageFormat } from '../types';
-import { QUICK_PRESETS } from '../lib/presetSizes';
+import { QUICK_PRESETS, PRESET_SIZES } from '../lib/presetSizes';
 
 interface ConfigState extends ConversionConfig {
   // Actions
@@ -28,65 +28,67 @@ const defaultConfig: ConversionConfig = {
   backgroundColor: undefined,
 };
 
-export const useConfigStore = create<ConfigState>((set, get) => ({
+export const useConfigStore = create<ConfigState>((set) => ({
   ...defaultConfig,
-  
-  toggleSize: (sizeId) => set((state) => {
-    const isSelected = state.selectedSizes.includes(sizeId);
-    return {
-      selectedSizes: isSelected
-        ? state.selectedSizes.filter(id => id !== sizeId)
-        : [...state.selectedSizes, sizeId],
-    };
-  }),
-  
-  selectAllSizes: () => {
-    // Import dynamically to avoid circular dependency
-    import('../lib/presetSizes').then(({ PRESET_SIZES }) => {
-      set({ selectedSizes: PRESET_SIZES.map(s => s.id) });
-    });
-  },
-  
+
+  toggleSize: (sizeId) =>
+    set((state) => {
+      const isSelected = state.selectedSizes.includes(sizeId);
+      return {
+        selectedSizes: isSelected
+          ? state.selectedSizes.filter((id) => id !== sizeId)
+          : [...state.selectedSizes, sizeId],
+      };
+    }),
+
+  selectAllSizes: () => set({ selectedSizes: PRESET_SIZES.map((s) => s.id) }),
+
   deselectAllSizes: () => set({ selectedSizes: [] }),
-  
-  addCustomSize: (width, height) => set((state) => ({
-    customSizes: [...state.customSizes, {
-      id: `custom-${Date.now()}`,
-      width,
-      height,
-      maintainAspectRatio: false,
-    }],
-  })),
-  
-  removeCustomSize: (id) => set((state) => ({
-    customSizes: state.customSizes.filter(size => size.id !== id),
-  })),
-  
-  toggleFormat: (format) => set((state) => {
-    const isSelected = state.selectedFormats.includes(format);
-    return {
-      selectedFormats: isSelected
-        ? state.selectedFormats.filter(f => f !== format)
-        : [...state.selectedFormats, format],
-    };
-  }),
-  
+
+  addCustomSize: (width, height) =>
+    set((state) => ({
+      customSizes: [
+        ...state.customSizes,
+        {
+          id: `custom-${Date.now()}`,
+          width,
+          height,
+          maintainAspectRatio: false,
+        },
+      ],
+    })),
+
+  removeCustomSize: (id) =>
+    set((state) => ({
+      customSizes: state.customSizes.filter((size) => size.id !== id),
+    })),
+
+  toggleFormat: (format) =>
+    set((state) => {
+      const isSelected = state.selectedFormats.includes(format);
+      return {
+        selectedFormats: isSelected
+          ? state.selectedFormats.filter((f) => f !== format)
+          : [...state.selectedFormats, format],
+      };
+    }),
+
   selectAllFormats: () => set({ selectedFormats: ['png', 'jpg', 'webp', 'ico', 'bmp'] }),
-  
+
   deselectAllFormats: () => set({ selectedFormats: [] }),
-  
+
   applyPreset: (presetId) => {
     const preset = QUICK_PRESETS[presetId];
     if (preset) {
-      set({ selectedSizes: preset.sizes });
+      set({ selectedSizes: [...preset.sizes] });
     }
   },
-  
+
   setQuality: (quality) => set({ quality }),
-  
+
   setMaintainAspectRatio: (value) => set({ maintainAspectRatio: value }),
-  
+
   setBackgroundColor: (color) => set({ backgroundColor: color }),
-  
+
   reset: () => set(defaultConfig),
 }));

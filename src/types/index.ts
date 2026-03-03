@@ -1,16 +1,7 @@
 /**
  * Image format types supported by Iconizer
  */
-export type ImageFormat = 
-  | 'png'
-  | 'jpg'
-  | 'jpeg'
-  | 'webp'
-  | 'ico'
-  | 'bmp'
-  | 'gif'
-  | 'tiff'
-  | 'svg';
+export type ImageFormat = 'png' | 'jpg' | 'jpeg' | 'webp' | 'ico' | 'bmp' | 'gif' | 'tiff' | 'svg';
 
 /**
  * Preset size configuration
@@ -150,7 +141,7 @@ export interface Preset {
 /**
  * Error types for image processing
  */
-export type ProcessingErrorType = 
+export type ProcessingErrorType =
   | 'invalid-format'
   | 'file-not-found'
   | 'permission-denied'
