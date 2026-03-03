@@ -8,17 +8,11 @@ pub struct FolderSelectionResult {
     pub cancelled: bool,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct FileSelectionResult {
-    pub paths: Vec<String>,
-    pub cancelled: bool,
-}
-
 /// Open folder selection dialog
 #[command]
 pub async fn select_folder(default_path: Option<String>) -> Result<FolderSelectionResult, String> {
     let app_handle = tauri::AppHandle::get_current().ok_or("App handle not available")?;
-    
+
     let folder = app_handle
         .dialog()
         .file()
@@ -37,10 +31,11 @@ pub async fn select_folder(default_path: Option<String>) -> Result<FolderSelecti
 }
 
 /// Open file selection dialog for images
+/// Returns array of file paths directly
 #[command]
-pub async fn select_files(filters: Option<Vec<String>>) -> Result<FileSelectionResult, String> {
+pub async fn select_files(filters: Option<Vec<String>>) -> Result<Vec<String>, String> {
     let app_handle = tauri::AppHandle::get_current().ok_or("App handle not available")?;
-    
+
     let files = app_handle
         .dialog()
         .file()
@@ -61,8 +56,9 @@ pub async fn select_files(filters: Option<Vec<String>>) -> Result<FileSelectionR
         .map(|p| p.to_string())
         .collect();
 
-    Ok(FileSelectionResult {
-        paths,
-        cancelled: paths.is_empty(),
-    })
+    if paths.is_empty() {
+        return Err("No files selected".to_string());
+    }
+
+    Ok(paths)
 }

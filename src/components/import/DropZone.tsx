@@ -40,7 +40,7 @@ export default function DropZone() {
               size: number;
               has_transparency: boolean;
             }>('get_image_metadata', { path });
-            
+
             return {
               name: metadata.name,
               path: metadata.path,
@@ -52,7 +52,7 @@ export default function DropZone() {
             } as ImageMetadata;
           } catch (error) {
             console.error('Failed to get metadata for:', path, error);
-            // Fallback: create basic metadata
+            // Fallback: create basic metadata from path
             const fileName = path.split(/[\\/]/).pop() || 'unknown';
             const ext = fileName.split('.').pop()?.toLowerCase() || 'png';
             return {
@@ -82,35 +82,29 @@ export default function DropZone() {
     async (e: React.DragEvent) => {
       e.preventDefault();
       setIsDragOver(false);
-
-      // For drag and drop from file system, we need to use the Tauri dialog
-      // since web drag events don't provide file paths
-      try {
-        const selected = await invoke<string[]>('select_files', {
-          filters: ['png', 'jpg', 'jpeg', 'webp', 'ico', 'bmp', 'gif', 'tiff', 'svg'],
-        });
-
-        if (selected && selected.length > 0) {
-          await processFiles(selected);
-        }
-      } catch (error) {
-        console.error('Failed to select files:', error);
-      }
     },
-    [processFiles]
+    []
   );
 
   const handleBrowse = useCallback(async () => {
     try {
-      const selected = await invoke<string[]>('select_files', {
+      setIsLoading(true);
+      
+      const paths = await invoke<string[]>('select_files', {
         filters: ['png', 'jpg', 'jpeg', 'webp', 'ico', 'bmp', 'gif', 'tiff', 'svg'],
       });
 
-      if (selected && selected.length > 0) {
-        await processFiles(selected);
+      if (paths && paths.length > 0) {
+        await processFiles(paths);
       }
     } catch (error) {
       console.error('Failed to select files:', error);
+      // Don't show error if user cancelled
+      if (error && typeof error === 'string' && !error.includes('No files selected')) {
+        alert(`Failed to select files: ${error}`);
+      }
+    } finally {
+      setIsLoading(false);
     }
   }, [processFiles]);
 
