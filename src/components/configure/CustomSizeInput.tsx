@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Plus, Lock, Unlock, Trash2 } from 'lucide-react';
 import { useConfigStore } from '../../stores/configStore';
 import { Button } from '../ui/button';
@@ -28,15 +28,15 @@ export default function CustomSizeInput({ className }: CustomSizeInputProps) {
   const [height, setHeight] = useState<string>('');
   const [maintainAspectRatio, setMaintainAspectRatio] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const widthInputRef = useRef<HTMLInputElement>(null);
+  const heightInputRef = useRef<HTMLInputElement>(null);
 
   /**
    * Validate dimension input
    */
   const validateDimension = useCallback((value: string): number | null => {
     const num = parseInt(value, 10);
-    if (isNaN(num)) return null;
-    if (num < MIN_DIMENSION) return MIN_DIMENSION;
-    if (num > MAX_DIMENSION) return MAX_DIMENSION;
+    if (isNaN(num) || num < MIN_DIMENSION || num > MAX_DIMENSION) return null;
     return num;
   }, []);
 
@@ -112,10 +112,20 @@ export default function CustomSizeInput({ className }: CustomSizeInputProps) {
     setError(null);
   }, [width, height, customSizes, validateDimension, addCustomSize]);
 
+  // Sync input values when state changes (handles React's null conversion for number inputs)
+  useEffect(() => {
+    if (widthInputRef.current && widthInputRef.current.value !== width) {
+      widthInputRef.current.value = width;
+    }
+    if (heightInputRef.current && heightInputRef.current.value !== height) {
+      heightInputRef.current.value = height;
+    }
+  }, [width, height]);
+
   /**
    * Handle key press for Enter key
    */
-  const handleKeyPress = useCallback(
+  const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === 'Enter') {
         handleAddSize();
@@ -139,13 +149,14 @@ export default function CustomSizeInput({ className }: CustomSizeInputProps) {
           <div className="space-y-2">
             <Label htmlFor="custom-width">Width (px)</Label>
             <Input
+              ref={widthInputRef}
               id="custom-width"
               type="number"
               min={MIN_DIMENSION}
               max={MAX_DIMENSION}
               value={width}
               onChange={handleWidthChange}
-              onKeyPress={handleKeyPress}
+              onKeyDown={handleKeyDown}
               placeholder="e.g., 200"
               className={cn(error && 'border-destructive')}
             />
@@ -154,13 +165,14 @@ export default function CustomSizeInput({ className }: CustomSizeInputProps) {
           <div className="space-y-2">
             <Label htmlFor="custom-height">Height (px)</Label>
             <Input
+              ref={heightInputRef}
               id="custom-height"
               type="number"
               min={MIN_DIMENSION}
               max={MAX_DIMENSION}
               value={height}
               onChange={handleHeightChange}
-              onKeyPress={handleKeyPress}
+              onKeyDown={handleKeyDown}
               placeholder="e.g., 200"
               className={cn(error && 'border-destructive')}
             />
@@ -193,7 +205,7 @@ export default function CustomSizeInput({ className }: CustomSizeInputProps) {
         {/* Add Button */}
         <Button
           onClick={handleAddSize}
-          disabled={!width || !height}
+          disabled={width === '' || height === ''}
           className="w-full"
           variant="default"
         >
@@ -225,6 +237,7 @@ export default function CustomSizeInput({ className }: CustomSizeInputProps) {
                     size="icon"
                     onClick={() => removeCustomSize(size.id)}
                     className="h-8 w-8 text-destructive hover:text-destructive"
+                    aria-label="Delete custom size"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>

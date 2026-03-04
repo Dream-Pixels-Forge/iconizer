@@ -44,6 +44,14 @@ export const SUPPORTED_FORMATS: OutputFormat[] = [
     isLossy: false,
     qualitySettings: false,
   },
+  {
+    id: 'gif',
+    name: 'GIF',
+    description: 'Animated format, supports transparency',
+    supportsTransparency: true,
+    isLossy: false,
+    qualitySettings: false,
+  },
 ];
 
 /**

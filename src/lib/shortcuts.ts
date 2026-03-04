@@ -164,13 +164,20 @@ export function formatShortcutKey(key: string): string {
   const platform = navigator.platform.toLowerCase();
   const isMac = platform.includes('mac');
 
-  return key
+  let result = key
     .replace(/Control/g, isMac ? '⌘' : 'Ctrl')
     .replace(/Command/g, '⌘')
     .replace(/Shift/g, '⇧')
     .replace(/Alt/g, isMac ? '⌥' : 'Alt')
     .replace(/Delete/g, 'Del')
     .replace(/Enter/g, '↵');
+
+  // Uppercase single character keys (like 'a' -> 'A')
+  if (result.length === 1 && /[a-z]/.test(result)) {
+    result = result.toUpperCase();
+  }
+
+  return result;
 }
 
 /**

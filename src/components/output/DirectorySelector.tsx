@@ -53,7 +53,7 @@ export default function DirectorySelector({
     } finally {
       setIsLoading(false);
     }
-  }, [onDirectorySelected, rememberLastPath, defaultOutputPath, setDefaultOutputPath]);
+  }, [onDirectorySelected, rememberLastPath, setDefaultOutputPath]);
 
   /**
    * Handle clearing the output path

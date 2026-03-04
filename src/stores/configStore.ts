@@ -50,7 +50,7 @@ export const useConfigStore = create<ConfigState>((set) => ({
       customSizes: [
         ...state.customSizes,
         {
-          id: `custom-${Date.now()}`,
+          id: `custom-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
           width,
           height,
           maintainAspectRatio: false,
