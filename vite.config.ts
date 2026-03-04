@@ -28,10 +28,11 @@ export default defineConfig(async () => ({
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
-    include: ['**/*.{test,spec}.{ts,tsx}'],
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    exclude: ['node_modules/', 'e2e/', '**/*.d.ts'],
     coverage: {
       reporter: ['text', 'json', 'html'],
-      exclude: ['node_modules/', 'src/test/', '**/*.d.ts'],
+      exclude: ['node_modules/', 'src/test/', 'e2e/', '**/*.d.ts'],
     },
   },
   build: {

@@ -28,14 +28,14 @@ describe('presetSizes', () => {
 
     it('should include favicon sizes', () => {
       const faviconSizes = PRESET_SIZES.filter((s: PresetSize) => s.category === 'favicon');
-      
+
       expect(faviconSizes.length).toBeGreaterThan(0);
       expect(faviconSizes.map((s: PresetSize) => s.id)).toContain('16x16');
     });
 
     it('should include app store sizes', () => {
       const appSizes = PRESET_SIZES.filter((s: PresetSize) => s.category === 'app');
-      
+
       expect(appSizes.length).toBeGreaterThan(0);
       expect(appSizes.map((s: PresetSize) => s.id)).toContain('1024x1024');
     });
@@ -80,28 +80,28 @@ describe('presetSizes', () => {
 
     it('web preset should include favicon sizes', () => {
       const webPreset = QUICK_PRESETS.web;
-      
+
       expect(webPreset.sizes).toContain('16x16');
       expect(webPreset.sizes).toContain('32x32');
     });
 
     it('mobile preset should include app sizes', () => {
       const mobilePreset = QUICK_PRESETS.mobile;
-      
+
       expect(mobilePreset.sizes).toContain('512x512');
       expect(mobilePreset.sizes).toContain('1024x1024');
     });
 
     it('desktop preset should include icon sizes', () => {
       const desktopPreset = QUICK_PRESETS.desktop;
-      
+
       expect(desktopPreset.sizes).toContain('48x48');
       expect(desktopPreset.sizes).toContain('128x128');
     });
 
     it('all preset should include all sizes', () => {
       const allPreset = QUICK_PRESETS.all;
-      
+
       expect(allPreset.sizes).toHaveLength(PRESET_SIZES.length);
     });
   });
@@ -109,21 +109,21 @@ describe('presetSizes', () => {
   describe('getSizesByCategory', () => {
     it('should return sizes for favicon category', () => {
       const sizes = getSizesByCategory('favicon');
-      
+
       expect(sizes.length).toBeGreaterThan(0);
       expect(sizes.every((s: PresetSize) => s.category === 'favicon')).toBe(true);
     });
 
     it('should return sizes for icon category', () => {
       const sizes = getSizesByCategory('icon');
-      
+
       expect(sizes.length).toBeGreaterThan(0);
       expect(sizes.every((s: PresetSize) => s.category === 'icon')).toBe(true);
     });
 
     it('should return empty array for social category (no sizes)', () => {
       const sizes = getSizesByCategory('social');
-      
+
       expect(sizes).toEqual([]);
     });
   });
@@ -131,7 +131,7 @@ describe('presetSizes', () => {
   describe('getSizeById', () => {
     it('should find size by id', () => {
       const size = getSizeById('512x512');
-      
+
       expect(size).toBeDefined();
       expect(size?.name).toBe('512×512');
       expect(size?.width).toBe(512);
@@ -140,13 +140,13 @@ describe('presetSizes', () => {
 
     it('should return undefined for non-existent id', () => {
       const size = getSizeById('999x999');
-      
+
       expect(size).toBeUndefined();
     });
 
     it('should find 16x16 size', () => {
       const size = getSizeById('16x16');
-      
+
       expect(size).toBeDefined();
       expect(size?.category).toBe('favicon');
     });
@@ -155,7 +155,7 @@ describe('presetSizes', () => {
   describe('getCategorySizes', () => {
     it('should return sizes grouped by category', () => {
       const categories = getCategorySizes();
-      
+
       expect(categories).toHaveProperty('favicon');
       expect(categories).toHaveProperty('icon');
       expect(categories).toHaveProperty('app');
@@ -163,7 +163,7 @@ describe('presetSizes', () => {
 
     it('should have correct number of sizes in each category', () => {
       const categories = getCategorySizes();
-      
+
       expect(categories.favicon.length).toBeGreaterThan(0);
       expect(categories.icon.length).toBeGreaterThan(0);
       expect(categories.app.length).toBeGreaterThan(0);
@@ -171,11 +171,8 @@ describe('presetSizes', () => {
 
     it('should contain all preset sizes across categories', () => {
       const categories = getCategorySizes();
-      const totalSizes = Object.values(categories).reduce(
-        (sum, sizes) => sum + sizes.length,
-        0
-      );
-      
+      const totalSizes = Object.values(categories).reduce((sum, sizes) => sum + sizes.length, 0);
+
       expect(totalSizes).toBe(PRESET_SIZES.length);
     });
   });

@@ -52,9 +52,7 @@ export function useKeyboardShortcuts(
       }
 
       // Find matching shortcut
-      const matchingShortcut = shortcuts.find((shortcut) =>
-        matchesShortcut(event, shortcut)
-      );
+      const matchingShortcut = shortcuts.find((shortcut) => matchesShortcut(event, shortcut));
 
       if (matchingShortcut && handlers[matchingShortcut.id]) {
         event.preventDefault();

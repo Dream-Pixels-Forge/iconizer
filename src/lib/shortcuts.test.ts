@@ -28,7 +28,7 @@ describe('shortcuts', () => {
 
     it('should have shortcuts in all categories', () => {
       const categories = new Set(DEFAULT_SHORTCUTS.map((s: Shortcut) => s.category));
-      
+
       expect(categories).toContain('general');
       expect(categories).toContain('navigation');
       expect(categories).toContain('actions');
@@ -37,7 +37,7 @@ describe('shortcuts', () => {
 
     it('should have help shortcut enabled', () => {
       const helpShortcut = DEFAULT_SHORTCUTS.find((s) => s.id === 'help');
-      
+
       expect(helpShortcut).toBeDefined();
       expect(helpShortcut?.enabled).toBe(true);
     });

@@ -76,7 +76,7 @@ describe('configStore', () => {
     it('should remove custom size by id', () => {
       const state = useConfigStore.getState();
       state.addCustomSize(100, 100);
-      
+
       const sizeId = useConfigStore.getState().customSizes[0].id;
       state.removeCustomSize(sizeId);
 

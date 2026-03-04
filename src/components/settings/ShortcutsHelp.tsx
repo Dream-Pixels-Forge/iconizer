@@ -1,5 +1,10 @@
 import { X } from 'lucide-react';
-import { DEFAULT_SHORTCUTS, SHORTCUT_CATEGORIES, formatShortcut, type Shortcut } from '../../lib/shortcuts';
+import {
+  DEFAULT_SHORTCUTS,
+  SHORTCUT_CATEGORIES,
+  formatShortcut,
+  type Shortcut,
+} from '../../lib/shortcuts';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
 import { cn } from '../../lib/utils';
@@ -22,11 +27,7 @@ export default function ShortcutsHelp({ onClose }: ShortcutsHelpProps) {
   return (
     <>
       {/* Backdrop */}
-      <div
-        className="fixed inset-0 z-50 bg-black/50"
-        onClick={onClose}
-        aria-hidden="true"
-      />
+      <div className="fixed inset-0 z-50 bg-black/50" onClick={onClose} aria-hidden="true" />
 
       {/* Dialog */}
       <div
@@ -55,9 +56,7 @@ export default function ShortcutsHelp({ onClose }: ShortcutsHelpProps) {
                     <Card key={category.id}>
                       <CardContent className="p-4">
                         <h3 className="mb-1 text-sm font-semibold">{category.label}</h3>
-                        <p className="mb-3 text-xs text-muted-foreground">
-                          {category.description}
-                        </p>
+                        <p className="mb-3 text-xs text-muted-foreground">{category.description}</p>
 
                         <div className="space-y-2">
                           {category.shortcuts.map((shortcut: Shortcut) => (
@@ -76,7 +75,7 @@ export default function ShortcutsHelp({ onClose }: ShortcutsHelpProps) {
                                   <kbd
                                     key={index}
                                     className={cn(
-                                      'inline-flex min-h-[24px] min-w-[24px] items-center justify-center rounded-md border bg-muted px-2 py-1 text-xs font-medium font-mono',
+                                      'inline-flex min-h-[24px] min-w-[24px] items-center justify-center rounded-md border bg-muted px-2 py-1 font-mono text-xs font-medium',
                                       'shadow-sm'
                                     )}
                                   >
@@ -98,10 +97,20 @@ export default function ShortcutsHelp({ onClose }: ShortcutsHelpProps) {
               <CardContent className="p-4">
                 <h3 className="mb-2 text-sm font-semibold">Tips</h3>
                 <ul className="list-inside list-disc space-y-1 text-sm text-muted-foreground">
-                  <li>Press <kbd className="rounded border bg-muted px-1 font-mono">?</kbd> anytime to open this help</li>
+                  <li>
+                    Press <kbd className="rounded border bg-muted px-1 font-mono">?</kbd> anytime to
+                    open this help
+                  </li>
                   <li>Shortcuts work globally except when typing in text fields</li>
-                  <li>Use number keys <kbd className="rounded border bg-muted px-1 font-mono">1</kbd>-<kbd className="rounded border bg-muted px-1 font-mono">4</kbd> to quickly navigate between sections</li>
-                  <li>On macOS, <kbd className="rounded border bg-muted px-1 font-mono">⌘</kbd> replaces <kbd className="rounded border bg-muted px-1 font-mono">Ctrl</kbd></li>
+                  <li>
+                    Use number keys <kbd className="rounded border bg-muted px-1 font-mono">1</kbd>-
+                    <kbd className="rounded border bg-muted px-1 font-mono">4</kbd> to quickly
+                    navigate between sections
+                  </li>
+                  <li>
+                    On macOS, <kbd className="rounded border bg-muted px-1 font-mono">⌘</kbd>{' '}
+                    replaces <kbd className="rounded border bg-muted px-1 font-mono">Ctrl</kbd>
+                  </li>
                 </ul>
               </CardContent>
             </Card>
