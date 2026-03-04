@@ -1,12 +1,5 @@
 use tauri::command;
-use serde::{Deserialize, Serialize};
 use tauri_plugin_dialog::DialogExt;
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct FolderSelectionResult {
-    pub path: Option<String>,
-    pub cancelled: bool,
-}
 
 /// Open folder selection dialog
 #[command]

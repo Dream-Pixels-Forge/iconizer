@@ -4,6 +4,8 @@ use std::sync::Mutex;
 use tauri::State;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+// Settings management (unused but kept for future use)
+#[allow(dead_code)]
 pub struct AppSettings {
     pub theme: String,
     pub default_output_path: Option<String>,
@@ -26,9 +28,13 @@ impl Default for AppSettings {
     }
 }
 
+// Settings management (unused but kept for future use)
+#[allow(dead_code)]
 pub struct SettingsState(Mutex<AppSettings>);
 
 /// Get current settings
+// Settings management (unused but kept for future use)
+#[allow(dead_code)]
 #[command]
 pub fn get_settings(state: State<SettingsState>) -> Result<AppSettings, String> {
     let settings = state.0.lock().map_err(|e| e.to_string())?;
@@ -36,6 +42,8 @@ pub fn get_settings(state: State<SettingsState>) -> Result<AppSettings, String> 
 }
 
 /// Save settings
+// Settings management (unused but kept for future use)
+#[allow(dead_code)]
 #[command]
 pub fn save_settings(settings: AppSettings, state: State<SettingsState>) -> Result<(), String> {
     let mut current = state.0.lock().map_err(|e| e.to_string())?;

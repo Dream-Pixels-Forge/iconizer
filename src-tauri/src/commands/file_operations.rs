@@ -38,6 +38,8 @@ pub async fn open_folder(path: String) -> Result<OperationResult, String> {
 
 /// Create directory if it doesn't exist
 #[command]
+// File operation utilities (unused but kept for future use)
+#[allow(dead_code)]
 pub async fn create_directory(path: String) -> Result<OperationResult, String> {
     match std::fs::create_dir_all(&path) {
         Ok(_) => Ok(OperationResult {
@@ -55,11 +57,15 @@ pub async fn create_directory(path: String) -> Result<OperationResult, String> {
 
 /// Check if file exists
 #[command]
+// File operation utilities (unused but kept for future use)
+#[allow(dead_code)]
 pub async fn file_exists(path: String) -> Result<bool, String> {
     Ok(std::path::Path::new(&path).exists())
 }
 
 /// Get file info (size, modified date, etc.)
+// File operation utilities (unused but kept for future use)
+#[allow(dead_code)]
 #[command]
 pub async fn get_file_info(path: String) -> Result<serde_json::Value, String> {
     let metadata = std::fs::metadata(&path)
