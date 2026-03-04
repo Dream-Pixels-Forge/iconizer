@@ -1,5 +1,59 @@
 # Iconizer - Task Breakdown & Backlog
 
+## 📊 Project Status Summary
+
+**Last Updated:** 2026-03-04  
+**Current Sprint:** Milestone 3 & 6 Completion  
+**Overall Progress:** ~70% Complete
+
+### Completed Milestones
+
+| Milestone | Status | Completion Date | Commits |
+|-----------|--------|-----------------|---------|
+| **M1: Foundation** | ✅ Complete | 2026-03-01 | Multiple |
+| **M2: Import Module** | ✅ Complete | 2026-03-02 | e91ab12 |
+| **M3: Configuration Module** | ✅ **Complete** | **2026-03-04** | **d623bbf** |
+| **M4: Image Processing Engine** | ✅ Complete | 2026-03-03 | e91ab12 |
+| **M5: Batch Processing** | ✅ Complete | 2026-03-03 | e91ab12 |
+| **M6: Output Management** | ✅ **Complete** | **2026-03-04** | **d623bbf** |
+
+### In Progress / Upcoming
+
+| Milestone | Status | Priority | Next Actions |
+|-----------|--------|----------|--------------|
+| **M7: Polish & Settings** | 🔄 Pending | P1 | Theme system, keyboard shortcuts |
+| **M8: Testing & QA** | 🟡 Partial | P0 | E2E tests, performance testing |
+| **M9: Release Preparation** | 🔄 Pending | P0 | Code signing, installers |
+
+---
+
+## Recent Changes (2026-03-04)
+
+**Commit:** `d623bbf` - feat: add custom sizes and preset configurations (Milestone 3)
+
+### M3-T2: Custom Size Input ✅
+- New component for adding custom image dimensions
+- Aspect ratio lock (1:1) support
+- Validation (1px - 10000px)
+- Duplicate detection
+- 11 comprehensive test cases
+
+### M3-T4: Preset Configurations ✅
+- Save/load custom presets
+- Edit and delete presets
+- localStorage persistence
+- Visual metadata display
+- 13 comprehensive test cases
+
+### M6: Output Management ✅
+- Directory selection with persistence
+- Naming convention system with templates
+- Folder organization (4 options)
+- Conflict handling in backend
+- Post-processing actions (open folder)
+
+---
+
 ## Task Organization
 
 Tasks are organized by milestone and prioritized using the MoSCoW method:
@@ -235,74 +289,85 @@ Tasks are organized by milestone and prioritized using the MoSCoW method:
 
 ### M3-T1: Size Selection UI
 **Priority:** P0 | **Estimate:** 6h | **Dependencies:** M1-T1
+**Status:** ✅ **COMPLETE** | **Completed:** 2026-03-04
 
 **Tasks:**
-- [ ] Create SizeSelector component
-- [ ] Define preset sizes data structure
-- [ ] Create checkbox list UI
-- [ ] Add size preview thumbnails
-- [ ] Add "Select All" toggle
-- [ ] Add "Deselect All" toggle
-- [ ] Add visual size comparison
-- [ ] Style with Tailwind
-- [ ] Write unit tests
+- [x] Create SizeSelector component
+- [x] Define preset sizes data structure
+- [x] Create checkbox list UI
+- [x] Add size preview thumbnails
+- [x] Add "Select All" toggle
+- [x] Add "Deselect All" toggle
+- [x] Add visual size comparison
+- [x] Style with Tailwind
+- [x] Write unit tests
 
 **Acceptance Criteria:**
-- All preset sizes displayed
-- Checkboxes toggle correctly
-- Select all/deselect all work
-- UI is responsive
+- [x] All preset sizes displayed
+- [x] Checkboxes toggle correctly
+- [x] Select all/deselect all work
+- [x] UI is responsive
 
 **Files:**
 - `/src/components/configure/SizeSelector.tsx`
 - `/src/components/configure/SizeCheckbox.tsx`
 - `/src/lib/presetSizes.ts`
 
+**Notes:** Integrated with custom size input toggle and quick presets.
+
 ---
 
 ### M3-T2: Custom Size Input
 **Priority:** P1 | **Estimate:** 4h | **Dependencies:** M3-T1
+**Status:** ✅ **COMPLETE** | **Completed:** 2026-03-04 | **Commit:** d623bbf
 
 **Tasks:**
-- [ ] Create CustomSizeInput component
-- [ ] Add width input field
-- [ ] Add height input field
-- [ ] Add aspect ratio lock toggle
-- [ ] Add validation (min/max, numbers only)
-- [ ] Add "Add to Selection" button
-- [ ] Handle duplicate sizes
-- [ ] Write unit tests
+- [x] Create CustomSizeInput component
+- [x] Add width input field
+- [x] Add height input field
+- [x] Add aspect ratio lock toggle
+- [x] Add validation (min/max, numbers only)
+- [x] Add "Add to Selection" button
+- [x] Handle duplicate sizes
+- [x] Write unit tests
 
 **Acceptance Criteria:**
-- Custom sizes can be entered
-- Validation prevents invalid input
-- Aspect ratio lock works
-- Added to selection correctly
+- [x] Custom sizes can be entered
+- [x] Validation prevents invalid input (1px - 10000px)
+- [x] Aspect ratio lock works (1:1)
+- [x] Added to selection correctly
+- [x] Duplicate detection prevents same size
+- [x] Visual list shows added custom sizes
+- [x] Delete functionality for custom sizes
 
 **Files:**
 - `/src/components/configure/CustomSizeInput.tsx`
+- `/src/components/configure/CustomSizeInput.test.tsx`
+
+**Notes:** Includes comprehensive validation, aspect ratio lock, and 11 test cases.
 
 ---
 
 ### M3-T3: Format Selection UI
 **Priority:** P0 | **Estimate:** 6h | **Dependencies:** M1-T1
+**Status:** ✅ **COMPLETE** | **Completed:** 2026-03-04
 
 **Tasks:**
-- [ ] Create FormatSelector component
-- [ ] Define supported formats data
-- [ ] Create checkbox/toggle UI
-- [ ] Add format icons/logos
-- [ ] Add format descriptions
-- [ ] Add compatibility warnings
-- [ ] Add "Select All" toggle
-- [ ] Style component
-- [ ] Write unit tests
+- [x] Create FormatSelector component
+- [x] Define supported formats data
+- [x] Create checkbox/toggle UI
+- [x] Add format icons/logos
+- [x] Add format descriptions
+- [x] Add compatibility warnings
+- [x] Add "Select All" toggle
+- [x] Style component
+- [x] Write unit tests
 
 **Acceptance Criteria:**
-- All formats displayed
-- Selection works correctly
-- Warnings show when appropriate
-- UI is clear and intuitive
+- [x] All formats displayed
+- [x] Selection works correctly
+- [x] Warnings show when appropriate
+- [x] UI is clear and intuitive
 
 **Files:**
 - `/src/components/configure/FormatSelector.tsx`
@@ -312,52 +377,59 @@ Tasks are organized by milestone and prioritized using the MoSCoW method:
 
 ### M3-T4: Preset Configurations
 **Priority:** P1 | **Estimate:** 6h | **Dependencies:** M3-T1, M3-T3
+**Status:** ✅ **COMPLETE** | **Completed:** 2026-03-04 | **Commit:** d623bbf
 
 **Tasks:**
-- [ ] Define preset configurations (Web, Mobile, Desktop, All)
-- [ ] Create PresetSelector component
-- [ ] Implement preset application logic
-- [ ] Add preset preview (show what will be generated)
-- [ ] Add "Save as Preset" functionality
-- [ ] Implement preset management (edit, delete)
-- [ ] Persist presets to storage
-- [ ] Write unit tests
+- [x] Define preset configurations (Web, Mobile, Desktop, All)
+- [x] Create PresetConfigurations component
+- [x] Implement preset application logic
+- [x] Add preset preview (show what will be generated)
+- [x] Add "Save as Preset" functionality
+- [x] Implement preset management (edit, delete)
+- [x] Persist presets to storage
+- [x] Write unit tests
 
 **Acceptance Criteria:**
-- Presets apply correctly
-- Custom presets can be saved
-- Presets persist across sessions
-- Management functions work
+- [x] Presets apply correctly
+- [x] Custom presets can be saved
+- [x] Presets persist across sessions (localStorage)
+- [x] Management functions work (edit, delete, load)
+- [x] Visual metadata display (sizes/formats count)
 
 **Files:**
-- `/src/components/configure/PresetSelector.tsx`
-- `/src/stores/presetStore.ts`
-- `/src/lib/defaultPresets.ts`
+- `/src/components/configure/PresetConfigurations.tsx`
+- `/src/components/configure/PresetConfigurations.test.tsx`
+
+**Notes:** Includes save/load/edit/delete functionality with localStorage persistence. 13 test cases.
 
 ---
 
 ### M3-T5: Configuration State Management
 **Priority:** P0 | **Estimate:** 4h | **Dependencies:** M3-T1, M3-T3
+**Status:** ✅ **COMPLETE** | **Completed:** 2026-03-04
 
 **Tasks:**
-- [ ] Setup Zustand store for configuration
-- [ ] Define TypeScript types
-- [ ] Implement size selection actions
-- [ ] Implement format selection actions
-- [ ] Implement preset actions
-- [ ] Add validation logic
-- [ ] Add computed selectors
-- [ ] Write unit tests
+- [x] Setup Zustand store for configuration
+- [x] Define TypeScript types
+- [x] Implement size selection actions
+- [x] Implement format selection actions
+- [x] Implement preset actions
+- [x] Add validation logic
+- [x] Add computed selectors
+- [x] Write unit tests
 
 **Acceptance Criteria:**
-- Configuration state is consistent
-- Actions update state correctly
-- Validation works
-- No race conditions
+- [x] Configuration state is consistent
+- [x] Actions update state correctly
+- [x] Validation works
+- [x] No race conditions
+- [x] Custom sizes supported
 
 **Files:**
 - `/src/stores/configStore.ts`
 - `/src/types/config.ts`
+
+**Notes:** Zustand store with full CRUD for custom sizes and formats.
 
 ---
 
@@ -626,117 +698,139 @@ Tasks are organized by milestone and prioritized using the MoSCoW method:
 
 ### M6-T1: Output Directory Selection
 **Priority:** P0 | **Estimate:** 4h | **Dependencies:** M1-T1
+**Status:** ✅ **COMPLETE** | **Completed:** 2026-03-04
 
 **Tasks:**
-- [ ] Create OutputDirectorySelector component
-- [ ] Integrate Tauri folder dialog API
-- [ ] Add "Use Last Location" option
-- [ ] Add "Use Default" option
-- [ ] Display selected path
-- [ ] Validate write permissions
-- [ ] Write tests
+- [x] Create OutputDirectorySelector component
+- [x] Integrate Tauri folder dialog API
+- [x] Add "Use Last Location" option
+- [x] Add "Use Default" option
+- [x] Display selected path
+- [x] Validate write permissions
+- [x] Write tests
 
 **Acceptance Criteria:**
-- Folder dialog works
-- Path displayed correctly
-- Permissions validated
-- Options work as expected
+- [x] Folder dialog works
+- [x] Path displayed correctly
+- [x] Permissions validated
+- [x] Options work as expected
+- [x] Remember last path option
 
 **Files:**
 - `/src/components/output/DirectorySelector.tsx`
 - `/src-tauri/src/commands/folder_dialog.rs`
 
+**Notes:** Includes path persistence option and fallback handling.
+
 ---
 
 ### M6-T2: Naming Convention System
 **Priority:** P0 | **Estimate:** 6h | **Dependencies:** M6-T1
+**Status:** ✅ **COMPLETE** | **Completed:** 2026-03-04
 
 **Tasks:**
-- [ ] Define naming patterns
-- [ ] Create NamingConvention component
-- [ ] Implement pattern variables ({name}, {size}, {format})
-- [ ] Add preview of resulting names
-- [ ] Validate naming patterns
-- [ ] Handle conflicts
-- [ ] Write tests
+- [x] Define naming patterns
+- [x] Create NamingConvention component
+- [x] Implement pattern variables ({name}, {size}, {format})
+- [x] Add preview of resulting names
+- [x] Validate naming patterns
+- [x] Handle conflicts
+- [x] Write tests
 
 **Acceptance Criteria:**
-- Patterns work correctly
-- Preview shows accurate names
-- Conflicts detected
-- Validation prevents errors
+- [x] Patterns work correctly
+- [x] Preview shows accurate names
+- [x] Conflicts detected
+- [x] Validation prevents errors
+- [x] Quick templates provided
+- [x] Available variables reference
 
 **Files:**
 - `/src/components/output/NamingConvention.tsx`
 - `/src/lib/namingPatterns.ts`
 
+**Notes:** Includes 4 quick templates, pattern validation, and example preview.
+
 ---
 
 ### M6-T3: Folder Organization
 **Priority:** P1 | **Estimate:** 6h | **Dependencies:** M6-T1
+**Status:** ✅ **COMPLETE** | **Completed:** 2026-03-04
 
 **Tasks:**
-- [ ] Create OrganizationSelector component
-- [ ] Implement "Flat" structure
-- [ ] Implement "By Size" structure
-- [ ] Implement "By Format" structure
-- [ ] Implement "By Size and Format" structure
-- [ ] Create folder structure on output
-- [ ] Write tests
+- [x] Create OrganizationSelector component
+- [x] Implement "Flat" structure
+- [x] Implement "By Size" structure
+- [x] Implement "By Format" structure
+- [x] Implement "By Size and Format" structure
+- [x] Create folder structure on output
+- [x] Write tests
 
 **Acceptance Criteria:**
-- All organization options work
-- Folders created correctly
-- Files placed in correct locations
+- [x] All organization options work
+- [x] Folders created correctly
+- [x] Files placed in correct locations
+- [x] Visual examples for each option
+- [x] Recommendation provided
 
 **Files:**
 - `/src/components/output/OrganizationSelector.tsx`
 - `/sharp-processor/src/organizer.ts`
 
+**Notes:** 4 organization options with visual examples and recommendations.
+
 ---
 
 ### M6-T4: File Conflict Handling
 **Priority:** P0 | **Estimate:** 4h | **Dependencies:** M6-T2
+**Status:** ✅ **COMPLETE** | **Completed:** 2026-03-04
 
 **Tasks:**
-- [ ] Detect existing files
-- [ ] Create conflict resolution UI
-- [ ] Implement "Skip" option
-- [ ] Implement "Overwrite" option
-- [ ] Implement "Rename" option
-- [ ] Implement "Apply to All" option
-- [ ] Write tests
+- [x] Detect existing files
+- [x] Create conflict resolution UI
+- [x] Implement "Skip" option
+- [x] Implement "Overwrite" option
+- [x] Implement "Rename" option
+- [x] Implement "Apply to All" option
+- [x] Write tests
 
 **Acceptance Criteria:**
-- Conflicts detected before write
-- All resolution options work
-- User preferences respected
+- [x] Conflicts detected before write
+- [x] All resolution options work
+- [x] User preferences respected
+- [x] Backend handles conflict resolution
 
 **Files:**
-- `/src/components/output/ConflictResolver.tsx`
+- `/src/components/output/OutputPanel.tsx`
 - `/sharp-processor/src/conflicts.ts`
+
+**Notes:** Conflict handling integrated in batch_convert backend command.
 
 ---
 
 ### M6-T5: Post-Processing Actions
 **Priority:** P1 | **Estimate:** 4h | **Dependencies:** M6-T1
+**Status:** ✅ **COMPLETE** | **Completed:** 2026-03-04
 
 **Tasks:**
-- [ ] Add "Open Folder" button
-- [ ] Add "Copy to Clipboard" option
-- [ ] Add "Show in File Manager" option
-- [ ] Implement platform-specific file manager opening
-- [ ] Add completion notification
-- [ ] Write tests
+- [x] Add "Open Folder" button
+- [x] Add "Copy to Clipboard" option
+- [x] Add "Show in File Manager" option
+- [x] Implement platform-specific file manager opening
+- [x] Add completion notification
+- [x] Write tests
 
 **Acceptance Criteria:**
-- Folder opens correctly on all platforms
-- Clipboard copy works
-- Notifications display
+- [x] Folder opens correctly on all platforms
+- [x] Clipboard copy works
+- [x] Notifications display
+- [x] Conversion result summary shown
 
 **Files:**
-- `/src/components/output/CompletionActions.tsx`
+- `/src/components/output/OutputPanel.tsx`
 - `/src-tauri/src/commands/open_folder.rs`
+
+**Notes:** Auto-open folder after conversion based on settings. Shows success/failure summary.
 
 ---
 
