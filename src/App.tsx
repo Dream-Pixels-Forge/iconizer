@@ -4,10 +4,12 @@ import {
   Settings,
   Info,
   Keyboard,
-  Sparkles,
-  Zap,
   Layers,
   Palette,
+  FolderOpen,
+  ArrowRight,
+  Check,
+  Download,
 } from 'lucide-react';
 import DropZone from './components/import/DropZone';
 import SizeSelector from './components/configure/SizeSelector';
@@ -17,11 +19,63 @@ import OutputPanel from './components/output/OutputPanel';
 import SettingsPanel from './components/settings/SettingsPanel';
 import ShortcutsHelp from './components/settings/ShortcutsHelp';
 import ThemeToggle from './components/ui/ThemeToggle';
+import { useImportStore } from './stores/importStore';
+import { useConfigStore } from './stores/configStore';
+
+type Step = 'import' | 'sizes' | 'formats' | 'output';
 
 function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   const [showShortcutHelp, setShowShortcutHelp] = useState(false);
+  const [activeStep, setActiveStep] = useState<Step>('import');
+
+  const images = useImportStore((state) => state.images);
+  const selectedSizes = useConfigStore((state) => state.selectedSizes);
+  const selectedFormats = useConfigStore((state) => state.selectedFormats);
+
+  const steps: { id: Step; label: string; icon: React.ReactNode }[] = [
+    { id: 'import', label: 'Import', icon: <FolderOpen className="h-5 w-5" /> },
+    { id: 'sizes', label: 'Sizes', icon: <Layers className="h-5 w-5" /> },
+    { id: 'formats', label: 'Formats', icon: <Palette className="h-5 w-5" /> },
+    { id: 'output', label: 'Output', icon: <Download className="h-5 w-5" /> },
+  ];
+
+  const getStepStatus = (step: Step) => {
+    const stepIndex = steps.findIndex((s) => s.id === step);
+    const currentIndex = steps.findIndex((s) => s.id === activeStep);
+
+    if (stepIndex < currentIndex) return 'completed';
+    if (stepIndex === currentIndex) return 'active';
+    return 'pending';
+  };
+
+  const canProceed = () => {
+    switch (activeStep) {
+      case 'import':
+        return images.length > 0;
+      case 'sizes':
+        return selectedSizes.length > 0;
+      case 'formats':
+        return selectedFormats.length > 0;
+      case 'output':
+        return true;
+    }
+  };
+
+  const nextStep = () => {
+    const currentIndex = steps.findIndex((s) => s.id === activeStep);
+    if (currentIndex < steps.length - 1) {
+      setActiveStep(steps[currentIndex + 1].id);
+    }
+  };
+
+  const prevStep = () => {
+    const currentIndex = steps.findIndex((s) => s.id === activeStep);
+    if (currentIndex > 0) {
+      setActiveStep(steps[currentIndex - 1].id);
+    }
+  };
 
   return (
     <div className="skeuo-scrollbar relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
@@ -87,130 +141,146 @@ function App() {
         </div>
       </header>
 
-      {/* Hero Section */}
       <div className="container relative z-10 mx-auto px-6 py-8">
-        <div className="mb-8 text-center">
-          <div className="surface-embossed mb-4 inline-flex items-center gap-2 rounded-full px-4 py-2">
-            <Sparkles className="h-4 w-4 text-amber-500" />
-            <span className="text-sm text-slate-600 dark:text-slate-300">
-              Professional Image Conversion Tool
-            </span>
+        {/* Progress Steps */}
+        <div className="mb-8">
+          <div className="flex items-center justify-center gap-2">
+            {steps.map((step, index) => (
+              <div key={step.id} className="flex items-center">
+                <button
+                  onClick={() => setActiveStep(step.id)}
+                  className={`
+                    flex items-center gap-2 rounded-lg px-4 py-2 transition-all duration-200
+                    ${
+                      getStepStatus(step.id) === 'active'
+                        ? 'bg-gradient-to-b from-teal-500 to-teal-600 text-white shadow-md'
+                        : getStepStatus(step.id) === 'completed'
+                          ? 'bg-gradient-to-b from-green-500 to-green-600 text-white shadow-md'
+                          : 'surface-embossed text-slate-500 dark:text-slate-400'
+                    }
+                  `}
+                >
+                  {getStepStatus(step.id) === 'completed' ? (
+                    <Check className="h-4 w-4" />
+                  ) : (
+                    <span className="text-sm font-medium">{index + 1}</span>
+                  )}
+                  <span className="hidden text-sm font-medium sm:inline">{step.label}</span>
+                </button>
+                {index < steps.length - 1 && (
+                  <div
+                    className={`
+                    mx-2 h-0.5 w-8 rounded-full transition-colors
+                    ${getStepStatus(step.id) === 'completed' ? 'bg-green-500' : 'bg-slate-300 dark:bg-slate-600'}
+                  `}
+                  />
+                )}
+              </div>
+            ))}
           </div>
-          <h2 className="mb-4 text-4xl font-bold md:text-5xl">
-            <span className="text-slate-800 dark:text-white">Convert Images</span>
-            <br />
-            <span className="text-teal-600 dark:text-teal-400">at Lightning Speed</span>
-          </h2>
-          <p className="mx-auto max-w-2xl text-lg text-slate-500 dark:text-slate-400">
-            Batch convert between formats and generate multiple sizes in one operation
-          </p>
         </div>
 
-        {/* Feature badges */}
-        <div className="mb-12 flex flex-wrap justify-center gap-3">
-          <div className="surface-embossed flex items-center gap-2 rounded-full px-4 py-2">
-            <Zap className="h-4 w-4 text-amber-500" />
-            <span className="text-sm text-slate-600 dark:text-slate-300">Fast Processing</span>
+        {/* Main Content Area */}
+        <div className="grid gap-6 lg:grid-cols-4">
+          {/* Sidebar - Step Info */}
+          <div className="lg:col-span-1">
+            <div className="skeuo-card sticky top-28 p-6">
+              <div className="mb-4 flex items-center gap-3">
+                <div
+                  className={`
+                  rounded-lg p-2
+                  ${activeStep === 'import' ? 'bg-gradient-to-b from-blue-500 to-blue-600' : ''}
+                  ${activeStep === 'sizes' ? 'bg-gradient-to-b from-purple-500 to-pink-500' : ''}
+                  ${activeStep === 'formats' ? 'bg-gradient-to-b from-cyan-500 to-blue-500' : ''}
+                  ${activeStep === 'output' ? 'bg-gradient-to-b from-green-500 to-emerald-500' : ''}
+                `}
+                >
+                  {steps.find((s) => s.id === activeStep)?.icon}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-slate-800 dark:text-white">
+                    {steps.find((s) => s.id === activeStep)?.label}
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Step {steps.findIndex((s) => s.id === activeStep) + 1} of 4
+                  </p>
+                </div>
+              </div>
+
+              {/* Summary */}
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-slate-500 dark:text-slate-400">Images:</span>
+                  <span className="font-medium">{images.length}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500 dark:text-slate-400">Sizes:</span>
+                  <span className="font-medium">{selectedSizes.length}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500 dark:text-slate-400">Formats:</span>
+                  <span className="font-medium">{selectedFormats.length}</span>
+                </div>
+              </div>
+
+              {/* Navigation */}
+              <div className="mt-6 flex gap-2">
+                <button
+                  onClick={prevStep}
+                  disabled={activeStep === 'import'}
+                  className="skeuo-btn-outline flex-1 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Back
+                </button>
+                <button
+                  onClick={nextStep}
+                  disabled={!canProceed() || activeStep === 'output'}
+                  className="skeuo-btn flex flex-1 items-center justify-center gap-1 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Next
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
           </div>
-          <div className="surface-embossed flex items-center gap-2 rounded-full px-4 py-2">
-            <Layers className="h-4 w-4 text-teal-500" />
-            <span className="text-sm text-slate-600 dark:text-slate-300">Batch Conversion</span>
-          </div>
-          <div className="surface-embossed flex items-center gap-2 rounded-full px-4 py-2">
-            <Palette className="h-4 w-4 text-purple-500" />
-            <span className="text-sm text-slate-600 dark:text-slate-300">10+ Formats</span>
+
+          {/* Main Panel */}
+          <div className="lg:col-span-3">
+            {/* Import Step */}
+            {activeStep === 'import' && (
+              <div className="skeuo-card p-6">
+                <DropZone />
+              </div>
+            )}
+
+            {/* Sizes Step */}
+            {activeStep === 'sizes' && (
+              <div className="space-y-6">
+                <div className="skeuo-card p-6">
+                  <SizeSelector />
+                </div>
+                <div className="skeuo-card p-6">
+                  <PresetConfigurations />
+                </div>
+              </div>
+            )}
+
+            {/* Formats Step */}
+            {activeStep === 'formats' && (
+              <div className="skeuo-card p-6">
+                <FormatSelector />
+              </div>
+            )}
+
+            {/* Output Step */}
+            {activeStep === 'output' && (
+              <div className="skeuo-card p-6">
+                <OutputPanel />
+              </div>
+            )}
           </div>
         </div>
       </div>
-
-      {/* Main Content */}
-      <main className="container relative z-10 mx-auto px-6 pb-12">
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* Left Column - Import */}
-          <div className="space-y-6 lg:col-span-1">
-            <section aria-labelledby="import-heading" className="skeuo-card p-6">
-              <div className="mb-6 flex items-center gap-3">
-                <div className="rounded-lg border-t border-teal-400/30 bg-gradient-to-b from-teal-500 to-teal-600 p-2 shadow-md">
-                  <ImageIcon className="h-5 w-5 text-white" />
-                </div>
-                <h2
-                  id="import-heading"
-                  className="text-xl font-semibold text-slate-800 dark:text-white"
-                >
-                  Import Images
-                </h2>
-              </div>
-              <DropZone />
-            </section>
-          </div>
-
-          {/* Middle Column - Configuration */}
-          <div className="space-y-6 lg:col-span-1">
-            <section aria-labelledby="sizes-heading" className="skeuo-card p-6">
-              <div className="mb-6 flex items-center gap-3">
-                <div className="rounded-lg border-t border-purple-400/30 bg-gradient-to-b from-purple-500 to-pink-500 p-2 shadow-md">
-                  <Layers className="h-5 w-5 text-white" />
-                </div>
-                <h2
-                  id="sizes-heading"
-                  className="text-xl font-semibold text-slate-800 dark:text-white"
-                >
-                  Select Sizes
-                </h2>
-              </div>
-              <SizeSelector />
-            </section>
-
-            <section aria-labelledby="formats-heading" className="skeuo-card p-6">
-              <div className="mb-6 flex items-center gap-3">
-                <div className="rounded-lg border-t border-cyan-400/30 bg-gradient-to-b from-cyan-500 to-blue-500 p-2 shadow-md">
-                  <Palette className="h-5 w-5 text-white" />
-                </div>
-                <h2
-                  id="formats-heading"
-                  className="text-xl font-semibold text-slate-800 dark:text-white"
-                >
-                  Select Formats
-                </h2>
-              </div>
-              <FormatSelector />
-            </section>
-
-            <section aria-labelledby="presets-heading" className="skeuo-card p-6">
-              <div className="mb-6 flex items-center gap-3">
-                <div className="rounded-lg border-t border-amber-400/30 bg-gradient-to-b from-amber-500 to-orange-500 p-2 shadow-md">
-                  <Sparkles className="h-5 w-5 text-white" />
-                </div>
-                <h2
-                  id="presets-heading"
-                  className="text-xl font-semibold text-slate-800 dark:text-white"
-                >
-                  Custom Presets
-                </h2>
-              </div>
-              <PresetConfigurations />
-            </section>
-          </div>
-
-          {/* Right Column - Output */}
-          <div className="space-y-6 lg:col-span-1">
-            <section aria-labelledby="output-heading" className="skeuo-card p-6">
-              <div className="mb-6 flex items-center gap-3">
-                <div className="rounded-lg border-t border-green-400/30 bg-gradient-to-b from-green-500 to-emerald-500 p-2 shadow-md">
-                  <Zap className="h-5 w-5 text-white" />
-                </div>
-                <h2
-                  id="output-heading"
-                  className="text-xl font-semibold text-slate-800 dark:text-white"
-                >
-                  Output
-                </h2>
-              </div>
-              <OutputPanel />
-            </section>
-          </div>
-        </div>
-      </main>
 
       {/* Settings Panel */}
       {showSettings && (
