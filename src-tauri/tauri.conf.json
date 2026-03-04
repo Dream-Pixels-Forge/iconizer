@@ -46,7 +46,6 @@
     "resources": []
   },
   "plugins": {
-    "dialog": {},
     "fs": {
       "scope": ["**"]
     },
