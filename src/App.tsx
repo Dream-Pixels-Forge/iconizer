@@ -1,15 +1,14 @@
 import { useState } from 'react';
-import { Moon, Sun, Image as ImageIcon, Settings, Info } from 'lucide-react';
+import { Image as ImageIcon, Settings, Info } from 'lucide-react';
 import DropZone from './components/import/DropZone';
 import SizeSelector from './components/configure/SizeSelector';
 import FormatSelector from './components/configure/FormatSelector';
 import PresetConfigurations from './components/configure/PresetConfigurations';
 import OutputPanel from './components/output/OutputPanel';
 import SettingsPanel from './components/settings/SettingsPanel';
-import { useTheme } from './hooks/useTheme';
+import ThemeToggle from './components/ui/ThemeToggle';
 
 function App() {
-  const { theme, setTheme } = useTheme();
   const [showSettings, setShowSettings] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
 
@@ -25,13 +24,7 @@ function App() {
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
-              aria-label="Toggle theme"
-            >
-              {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-            </button>
+            <ThemeToggle />
 
             <button
               onClick={() => setShowAbout(true)}
