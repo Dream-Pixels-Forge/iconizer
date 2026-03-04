@@ -3,8 +3,8 @@
 ## 📊 Project Status Summary
 
 **Last Updated:** 2026-03-04  
-**Current Sprint:** Milestone 7 Theme System  
-**Overall Progress:** ~75% Complete
+**Current Sprint:** Milestone 7 Completion  
+**Overall Progress:** ~80% Complete
 
 ### Completed Milestones
 
@@ -16,13 +16,12 @@
 | **M4: Image Processing Engine** | ✅ Complete | 2026-03-03 | e91ab12 |
 | **M5: Batch Processing** | ✅ Complete | 2026-03-03 | e91ab12 |
 | **M6: Output Management** | ✅ **Complete** | **2026-03-04** | **d623bbf** |
-| **M7: Polish & Settings** | 🟡 **Partial** | **2026-03-04** | **b2103c7** |
+| **M7: Polish & Settings** | ✅ **Complete** | **2026-03-04** | **3d8ba5c** |
 
 ### In Progress / Upcoming
 
 | Milestone | Status | Priority | Next Actions |
 |-----------|--------|----------|--------------|
-| **M7: Polish & Settings** | 🟡 Partial | P1 | Keyboard shortcuts (M7-T3) |
 | **M8: Testing & QA** | 🟡 Partial | P0 | E2E tests, performance testing |
 | **M9: Release Preparation** | 🔄 Pending | P0 | Code signing, installers |
 
@@ -30,17 +29,19 @@
 
 ## Recent Changes (2026-03-04)
 
-**Latest Commit:** `b2103c7` - feat: add enhanced theme system with dropdown toggle
+**Latest Commit:** `3d8ba5c` - feat: add keyboard shortcuts system
 
-### M7-T2: Theme System ✅
-- ThemeToggle component with dropdown menu
-- Light/Dark/System theme options
-- System theme auto-detection
-- Live theme switching
-- localStorage persistence
-- Radix UI dropdown integration
+### M7-T3: Keyboard Shortcuts ✅
+- 14 keyboard shortcuts across 4 categories
+- useKeyboardShortcuts hook for management
+- ShortcutsHelp dialog with visual key display
+- Platform-specific modifiers (Ctrl/Cmd)
+- Global shortcuts (? for help even when typing)
+- Navigation shortcuts (1-4)
+- Action shortcuts (Ctrl+Enter, Ctrl+O, Ctrl+A)
+- View shortcuts (theme toggle, zoom controls)
 
-**Previous:** `d623bbf` - feat: add custom sizes and preset configurations (Milestone 3)
+**Previous:** `b2103c7` - feat: add enhanced theme system with dropdown toggle
 
 ---
 
@@ -883,24 +884,31 @@ Tasks are organized by milestone and prioritized using the MoSCoW method:
 
 ### M7-T3: Keyboard Shortcuts
 **Priority:** P2 | **Estimate:** 4h | **Dependencies:** M7-T1
+**Status:** ✅ **COMPLETE** | **Completed:** 2026-03-04 | **Commit:** 3d8ba5c
 
 **Tasks:**
-- [ ] Define shortcut mappings
-- [ ] Implement shortcut listener
-- [ ] Add shortcuts for common actions
-- [ ] Create shortcuts help dialog
-- [ ] Add shortcut customization (optional)
-- [ ] Handle platform differences (Cmd vs Ctrl)
-- [ ] Write tests
+- [x] Define shortcut mappings
+- [x] Implement shortcut listener (useKeyboardShortcuts hook)
+- [x] Add shortcuts for common actions
+- [x] Create shortcuts help dialog
+- [x] Add shortcut customization support
+- [x] Handle platform differences (Cmd vs Ctrl)
+- [x] Write tests
 
 **Acceptance Criteria:**
-- Shortcuts trigger actions
-- Help dialog shows all shortcuts
-- Platform differences handled
+- [x] Shortcuts trigger actions
+- [x] Help dialog shows all shortcuts
+- [x] Platform differences handled
+- [x] Shortcuts work globally (configurable)
+- [x] Ignore when typing in inputs
+- [x] Visual keyboard shortcuts help
 
 **Files:**
 - `/src/lib/shortcuts.ts`
+- `/src/hooks/useKeyboardShortcuts.ts`
 - `/src/components/settings/ShortcutsHelp.tsx`
+
+**Notes:** 14 shortcuts across 4 categories (General, Navigation, Actions, View). Platform-aware modifiers.
 
 ---
 
