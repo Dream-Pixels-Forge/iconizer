@@ -33,7 +33,7 @@ export default function DirectorySelector({
       setIsLoading(true);
 
       // Use Tauri dialog plugin to select folder
-      const selected = await invoke<Option<string>>('select_folder');
+      const selected = await invoke<string | undefined>('select_folder');
 
       if (selected) {
         setOutputPath(selected);
