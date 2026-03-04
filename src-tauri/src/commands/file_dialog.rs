@@ -10,55 +10,14 @@ pub struct FolderSelectionResult {
 
 /// Open folder selection dialog
 #[command]
-pub async fn select_folder(default_path: Option<String>) -> Result<FolderSelectionResult, String> {
-    let app_handle = tauri::AppHandle::get_current().ok_or("App handle not available")?;
-
-    let folder = app_handle
-        .dialog()
+pub async fn select_folder(app: tauri::AppHandle) -> Result<Option<String>, String> {
+    let (tx, rx) = std::sync::mpsc::channel();
+    
+    app.dialog()
         .file()
-        .pick_folder();
+        .pick_folder(move |folder| {
+            let _ = tx.send(folder.map(|p| p.to_string()));
+        });
 
-    match folder {
-        Some(path) => Ok(FolderSelectionResult {
-            path: Some(path.to_string()),
-            cancelled: false,
-        }),
-        None => Ok(FolderSelectionResult {
-            path: None,
-            cancelled: true,
-        }),
-    }
-}
-
-/// Open file selection dialog for images
-/// Returns array of file paths directly
-#[command]
-pub async fn select_files(filters: Option<Vec<String>>) -> Result<Vec<String>, String> {
-    let app_handle = tauri::AppHandle::get_current().ok_or("App handle not available")?;
-
-    let files = app_handle
-        .dialog()
-        .file()
-        .add_filter("Images", &filters.unwrap_or_else(|| vec![
-            "png".to_string(),
-            "jpg".to_string(),
-            "jpeg".to_string(),
-            "webp".to_string(),
-            "bmp".to_string(),
-            "gif".to_string(),
-            "tiff".to_string(),
-            "svg".to_string(),
-        ]))
-        .pick_files();
-
-    let paths: Vec<String> = files
-        .into_iter()
-        .map(|p| p.to_string())
-        .collect();
-
-    if paths.is_empty() {
-        return Err("No files selected".to_string());
-    }
-
-    Ok(paths)
+    rx.recv().map_err(|e| e.to_string())
 }

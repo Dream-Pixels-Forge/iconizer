@@ -18,10 +18,7 @@ fn main() {
             image_processing::batch_convert,
             image_processing::get_image_metadata,
             file_dialog::select_folder,
-            file_dialog::select_file,
             file_operations::open_folder,
-            config::get_settings,
-            config::save_settings,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

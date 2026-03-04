@@ -33,9 +33,7 @@ export default function DirectorySelector({
       setIsLoading(true);
 
       // Use Tauri dialog plugin to select folder
-      const selected = await invoke<string | null>('select_folder', {
-        defaultPath: defaultOutputPath || null,
-      });
+      const selected = await invoke<Option<string>>('select_folder');
 
       if (selected) {
         setOutputPath(selected);
@@ -51,10 +49,7 @@ export default function DirectorySelector({
       }
     } catch (error) {
       console.error('Failed to select folder:', error);
-      // Fallback: use a default path for testing
-      const fallbackPath = 'C:\\Users\\User\\Pictures\\Iconizer Output';
-      setOutputPath(fallbackPath);
-      onDirectorySelected?.(fallbackPath);
+      // User cancelled or error
     } finally {
       setIsLoading(false);
     }

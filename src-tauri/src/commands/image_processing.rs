@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use tauri::command;
-use image::{DynamicImage, GenericImageView, ImageFormat};
+use image::{GenericImageView, ImageFormat};
 use std::path::{Path, Component};
 use tokio::task::spawn_blocking;
 
@@ -38,7 +38,7 @@ pub struct ImageMetadata {
     pub has_transparency: bool,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ConversionOptions {
     pub target_format: String,
     pub target_width: u32,
@@ -104,8 +104,8 @@ fn get_output_format(format: &str) -> ImageFormat {
         "jpg" | "jpeg" => ImageFormat::Jpeg,
         "webp" => ImageFormat::WebP,
         "bmp" => ImageFormat::Bmp,
-        "gif" => Some(ImageFormat::Gif),
-        "tiff" => Some(ImageFormat::Tiff),
+        "gif" => ImageFormat::Gif,
+        "tiff" => ImageFormat::Tiff,
         "ico" => ImageFormat::Png, // ICO handled separately
         _ => ImageFormat::Png,
     }
@@ -201,7 +201,7 @@ pub async fn convert_image(request: ConversionRequest) -> Result<ConversionResul
         match output_format {
             ImageFormat::Jpeg => {
                 // Convert to RGB if necessary (JPEG doesn't support alpha)
-                let rgb_img = processed_img.convert_rgb8();
+                let rgb_img = processed_img.to_rgb8();
                 rgb_img.save_with_format(&output_path, ImageFormat::Jpeg)
                     .map_err(|e| format!("Failed to save JPEG: {}", e))?;
             }
