@@ -3,8 +3,8 @@
 ## 📊 Project Status Summary
 
 **Last Updated:** 2026-03-04  
-**Current Sprint:** Milestone 3 & 6 Completion  
-**Overall Progress:** ~70% Complete
+**Current Sprint:** Milestone 7 Theme System  
+**Overall Progress:** ~75% Complete
 
 ### Completed Milestones
 
@@ -16,12 +16,13 @@
 | **M4: Image Processing Engine** | ✅ Complete | 2026-03-03 | e91ab12 |
 | **M5: Batch Processing** | ✅ Complete | 2026-03-03 | e91ab12 |
 | **M6: Output Management** | ✅ **Complete** | **2026-03-04** | **d623bbf** |
+| **M7: Polish & Settings** | 🟡 **Partial** | **2026-03-04** | **b2103c7** |
 
 ### In Progress / Upcoming
 
 | Milestone | Status | Priority | Next Actions |
 |-----------|--------|----------|--------------|
-| **M7: Polish & Settings** | 🔄 Pending | P1 | Theme system, keyboard shortcuts |
+| **M7: Polish & Settings** | 🟡 Partial | P1 | Keyboard shortcuts (M7-T3) |
 | **M8: Testing & QA** | 🟡 Partial | P0 | E2E tests, performance testing |
 | **M9: Release Preparation** | 🔄 Pending | P0 | Code signing, installers |
 
@@ -29,28 +30,17 @@
 
 ## Recent Changes (2026-03-04)
 
-**Commit:** `d623bbf` - feat: add custom sizes and preset configurations (Milestone 3)
+**Latest Commit:** `b2103c7` - feat: add enhanced theme system with dropdown toggle
 
-### M3-T2: Custom Size Input ✅
-- New component for adding custom image dimensions
-- Aspect ratio lock (1:1) support
-- Validation (1px - 10000px)
-- Duplicate detection
-- 11 comprehensive test cases
-
-### M3-T4: Preset Configurations ✅
-- Save/load custom presets
-- Edit and delete presets
+### M7-T2: Theme System ✅
+- ThemeToggle component with dropdown menu
+- Light/Dark/System theme options
+- System theme auto-detection
+- Live theme switching
 - localStorage persistence
-- Visual metadata display
-- 13 comprehensive test cases
+- Radix UI dropdown integration
 
-### M6: Output Management ✅
-- Directory selection with persistence
-- Naming convention system with templates
-- Folder organization (4 options)
-- Conflict handling in backend
-- Post-processing actions (open folder)
+**Previous:** `d623bbf` - feat: add custom sizes and preset configurations (Milestone 3)
 
 ---
 
@@ -862,25 +852,32 @@ Tasks are organized by milestone and prioritized using the MoSCoW method:
 
 ### M7-T2: Theme System
 **Priority:** P1 | **Estimate:** 6h | **Dependencies:** M7-T1
+**Status:** ✅ **COMPLETE** | **Completed:** 2026-03-04 | **Commit:** b2103c7
 
 **Tasks:**
-- [ ] Define theme configurations (dark, light, system)
-- [ ] Implement theme provider
-- [ ] Add theme toggle UI
-- [ ] Style all components for both themes
-- [ ] Add theme persistence
-- [ ] Test all components in both themes
-- [ ] Write tests
+- [x] Define theme configurations (dark, light, system)
+- [x] Implement theme provider (useTheme hook)
+- [x] Add theme toggle UI (ThemeToggle component)
+- [x] Style all components for both themes
+- [x] Add theme persistence (localStorage)
+- [x] Test all components in both themes
+- [x] Write unit tests
 
 **Acceptance Criteria:**
-- Both themes fully styled
-- Toggle works instantly
-- Theme persists
-- No visual issues
+- [x] Both themes fully styled
+- [x] Toggle works instantly
+- [x] Theme persists
+- [x] No visual issues
+- [x] System theme detection works
+- [x] Auto-switch on system theme change
 
 **Files:**
-- `/src/lib/themes.ts`
-- `/src/components/settings/ThemeToggle.tsx`
+- `/src/hooks/useTheme.ts`
+- `/src/components/ui/ThemeToggle.tsx`
+- `/src/components/ui/dropdown-menu.tsx`
+- `/src/index.css` (CSS variables)
+
+**Notes:** Dropdown menu with Light/Dark/System options. System theme auto-detection with live switching.
 
 ---
 
