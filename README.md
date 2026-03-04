@@ -1,9 +1,12 @@
 # Iconizer
 
+[![Release](https://img.shields.io/github/v/release/dream-pixels-forge/iconizer)](https://github.com/dream-pixels-forge/iconizer/releases)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/dream-pixels-forge/iconizer/ci.yml?branch=main)](https://github.com/dream-pixels-forge/iconizer/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://www.typescriptlang.org/)
 [![Tauri](https://img.shields.io/badge/Tauri-2.0-24C8CD)](https://tauri.app/)
+
+**Version:** 1.0.0-mvp | **Status:** Stable Release
 
 **Iconizer** is a powerful desktop application for batch image conversion and icon generation. Convert images between formats and generate multiple sizes in a single operation.
 
@@ -151,19 +154,72 @@ We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md)
 
 ## Roadmap
 
-### MVP (v1.0)
+### ✅ v1.0.0-mvp (Released 2026-03-04)
 - [x] Project setup and architecture
-- [ ] Core image conversion
-- [ ] Batch size generation
-- [ ] Selective output control
-- [ ] Basic UI/UX
+- [x] Core image conversion
+- [x] Batch size generation (10 presets + custom)
+- [x] Selective output control
+- [x] Complete UI/UX with themes
+- [x] Keyboard shortcuts
+- [x] Preset management
+- [x] Comprehensive testing (120+ tests)
+- [x] Documentation complete
 
-### Post-MVP
+### 🔄 v1.1.0 (Planned)
 - [ ] Batch editing (filters, adjustments)
 - [ ] Cloud preset sync
-- [ ] Plugin architecture
 - [ ] CLI version
-- [ ] API for integration
+- [ ] Performance optimizations
+
+### 📋 Future
+- [ ] Plugin architecture
+- [ ] API for third-party integration
+- [ ] Mobile version
+- [ ] Web version
+
+## Downloads
+
+Get the latest release from the [Releases Page](https://github.com/dream-pixels-forge/iconizer/releases)
+
+### Available Packages
+
+| Platform | Package | Download |
+|----------|---------|----------|
+| **Windows** | NSIS Installer (.exe) | [Download](../../releases/latest) |
+| **Windows** | MSI Installer (.msi) | [Download](../../releases/latest) |
+| **macOS** | DMG (.dmg) | [Download](../../releases/latest) |
+| **macOS** | App Bundle (.app) | [Download](../../releases/latest) |
+| **Linux** | AppImage (.AppImage) | [Download](../../releases/latest) |
+| **Linux** | DEB Package (.deb) | [Download](../../releases/latest) |
+| **Linux** | RPM Package (.rpm) | [Download](../../releases/latest) |
+
+### Installation
+
+**Windows:**
+```powershell
+# Using winget (coming soon)
+winget install dream-pixels-forge.iconizer
+
+# Or download and run the .exe installer
+```
+
+**macOS:**
+```bash
+# Using Homebrew (coming soon)
+brew install --cask iconizer
+
+# Or download the .dmg and drag to Applications
+```
+
+**Linux:**
+```bash
+# Using AUR (coming soon)
+yay -S iconizer
+
+# Or download AppImage
+chmod +x Iconizer_*.AppImage
+./Iconizer_*.AppImage
+```
 
 ## License
 
