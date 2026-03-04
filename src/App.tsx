@@ -3,6 +3,7 @@ import { Moon, Sun, Image as ImageIcon, Settings, Info } from 'lucide-react';
 import DropZone from './components/import/DropZone';
 import SizeSelector from './components/configure/SizeSelector';
 import FormatSelector from './components/configure/FormatSelector';
+import PresetConfigurations from './components/configure/PresetConfigurations';
 import OutputPanel from './components/output/OutputPanel';
 import SettingsPanel from './components/settings/SettingsPanel';
 import { useTheme } from './hooks/useTheme';
@@ -79,6 +80,13 @@ function App() {
                 Select Formats
               </h2>
               <FormatSelector />
+            </section>
+
+            <section aria-labelledby="presets-heading">
+              <h2 id="presets-heading" className="mb-4 text-lg font-semibold">
+                Custom Presets
+              </h2>
+              <PresetConfigurations />
             </section>
           </div>
 

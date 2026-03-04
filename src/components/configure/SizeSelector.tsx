@@ -1,4 +1,5 @@
-import { CheckCheck } from 'lucide-react';
+import { useState } from 'react';
+import { CheckCheck, ChevronDown, ChevronUp } from 'lucide-react';
 import { useConfigStore } from '../../stores/configStore';
 import {
   PRESET_SIZES,
@@ -10,11 +11,16 @@ import { Button } from '../ui/button';
 import { Checkbox } from '../ui/checkbox';
 import { Card, CardContent } from '../ui/card';
 import { cn } from '../../lib/utils';
+import CustomSizeInput from './CustomSizeInput';
 
 export default function SizeSelector() {
-  const { selectedSizes, toggleSize, selectAllSizes, deselectAllSizes, applyPreset } =
+  const { selectedSizes, toggleSize, selectAllSizes, deselectAllSizes, applyPreset, customSizes } =
     useConfigStore();
   const categories = getCategorySizes();
+  const [showCustomSizeInput, setShowCustomSizeInput] = useState(false);
+
+  const totalSelected = selectedSizes.length + customSizes.length;
+  const totalAvailable = PRESET_SIZES.length;
 
   return (
     <div className="space-y-4">
@@ -36,18 +42,41 @@ export default function SizeSelector() {
       {/* Select All / Deselect All */}
       <div className="flex items-center justify-between">
         <span className="text-sm text-muted-foreground">
-          {selectedSizes.length} of {PRESET_SIZES.length} selected
+          {totalSelected} of {totalAvailable}+ selected
         </span>
         <div className="flex gap-2">
           <Button variant="ghost" size="sm" onClick={selectAllSizes} className="h-8 text-xs">
             <CheckCheck className="mr-1 h-4 w-4" />
-            Select All
+            Select All Presets
           </Button>
           <Button variant="ghost" size="sm" onClick={deselectAllSizes} className="h-8 text-xs">
             Deselect All
           </Button>
         </div>
       </div>
+
+      {/* Custom Size Input Toggle */}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => setShowCustomSizeInput(!showCustomSizeInput)}
+        className="w-full"
+      >
+        {showCustomSizeInput ? (
+          <>
+            <ChevronUp className="mr-2 h-4 w-4" />
+            Hide Custom Size Input
+          </>
+        ) : (
+          <>
+            <ChevronDown className="mr-2 h-4 w-4" />
+            Add Custom Size
+          </>
+        )}
+      </Button>
+
+      {/* Custom Size Input (conditionally rendered) */}
+      {showCustomSizeInput && <CustomSizeInput />}
 
       {/* Size Categories */}
       <div className="space-y-4">
