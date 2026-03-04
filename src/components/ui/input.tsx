@@ -9,7 +9,16 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <input
         type={type}
         className={cn(
-          'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+          // Base skeuomorphic input styles
+          'flex h-10 w-full rounded-lg border border-border bg-gradient-to-b from-input/20 to-input/40 px-3 py-2 text-sm ring-offset-background transition-all duration-150',
+          // Inner shadow for inset effect
+          'shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_2px_rgba(0,0,0,0.05),0_1px_0_rgba(255,255,255,0.5)]',
+          // Focus state
+          'focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/20',
+          // Placeholder
+          'placeholder:text-muted-foreground/60',
+          // Disabled
+          'disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none',
           className
         )}
         ref={ref}

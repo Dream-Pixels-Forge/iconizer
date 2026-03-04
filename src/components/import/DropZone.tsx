@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { FileImage, X } from 'lucide-react';
+import { FileImage, X, Upload } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 import { useImportStore } from '../../stores/importStore';
 import { Button } from '../ui/button';
@@ -113,26 +113,52 @@ export default function DropZone() {
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
+        onClick={handleBrowse}
         className={cn(
-          'flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 transition-colors',
-          'hover:bg-accent hover:text-accent-foreground',
-          isDragOver && 'border-primary bg-accent/50',
+          // Skeuomorphic drop zone
+          'relative flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 transition-all duration-200',
+          // Base state - inset surface
+          'bg-gradient-to-b from-card to-muted/20',
+          'border-border',
+          'shadow-[inset_0_2px_4px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.03)]',
+          // Hover state - slightly raised
+          'hover:border-primary/50',
+          'hover:bg-gradient-to-b hover:from-card hover:to-primary/5',
+          'hover:shadow-[inset_0_2px_4px_rgba(0,0,0,0.06),inset_0_1px_2px_rgba(0,0,0,0.05)]',
+          // Drag over state - pressed/active
+          isDragOver && 'border-primary bg-gradient-to-b from-primary/10 to-primary/5',
+          isDragOver && 'shadow-[inset_0_2px_8px_rgba(0,0,0,0.08),0_0_0_3px_rgba(0,0,0,0.1)]',
           'min-h-[200px]'
         )}
-        onClick={handleBrowse}
       >
-        <FileImage className="mb-4 h-12 w-12 text-muted-foreground" />
-        <h3 className="mb-2 text-lg font-medium">
+        <div
+          className={cn(
+            'mb-4 rounded-full p-4 transition-all duration-200',
+            isDragOver
+              ? 'bg-gradient-to-b from-primary/20 to-primary/10'
+              : 'bg-gradient-to-b from-muted/30 to-muted/20'
+          )}
+        >
+          <Upload
+            className={cn(
+              'h-12 w-12 transition-colors duration-200',
+              isDragOver ? 'text-primary' : 'text-muted-foreground'
+            )}
+          />
+        </div>
+        <h3 className="mb-2 text-lg font-medium text-foreground">
           {isDragOver ? 'Drop images here' : 'Drag & drop images'}
         </h3>
         <p className="mb-4 text-sm text-muted-foreground">or click to browse</p>
         <Button
           type="button"
+          variant="outline"
           disabled={isLoading}
           onClick={(e) => {
             e.stopPropagation();
             handleBrowse();
           }}
+          className="skeuo-btn-outline"
         >
           {isLoading ? 'Loading...' : 'Browse Files'}
         </Button>
@@ -155,10 +181,12 @@ export default function DropZone() {
             {images.map((image) => (
               <div
                 key={image.path}
-                className="flex items-center justify-between rounded-md border bg-card p-3"
+                className="flex items-center justify-between rounded-lg border bg-gradient-to-b from-card to-card/95 p-3 shadow-sm"
               >
                 <div className="flex items-center gap-3">
-                  <FileImage className="h-5 w-5 text-muted-foreground" />
+                  <div className="rounded-lg bg-gradient-to-b from-muted/30 to-muted/20 p-2">
+                    <FileImage className="h-5 w-5 text-muted-foreground" />
+                  </div>
                   <div>
                     <p className="text-sm font-medium">{image.name}</p>
                     <p className="text-xs text-muted-foreground">
