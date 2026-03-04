@@ -1,16 +1,62 @@
-import { useState } from 'react';
-import { Image as ImageIcon, Settings, Info } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import { Image as ImageIcon, Settings, Info, Keyboard } from 'lucide-react';
 import DropZone from './components/import/DropZone';
 import SizeSelector from './components/configure/SizeSelector';
 import FormatSelector from './components/configure/FormatSelector';
 import PresetConfigurations from './components/configure/PresetConfigurations';
 import OutputPanel from './components/output/OutputPanel';
 import SettingsPanel from './components/settings/SettingsPanel';
+import ShortcutsHelp from './components/settings/ShortcutsHelp';
 import ThemeToggle from './components/ui/ThemeToggle';
+import { useKeyboardShortcuts, useShortcutHelpStore } from './hooks/useKeyboardShortcuts';
+import { DEFAULT_SHORTCUTS } from './lib/shortcuts';
+import { useSettingsStore } from './stores/settingsStore';
 
 function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
+  const { showShortcutHelp, setShowShortcutHelp } = useShortcutHelpStore();
+  const { theme, setTheme } = useSettingsStore();
+
+  // Keyboard shortcut handlers
+  const handleToggleHelp = useCallback(() => {
+    setShowShortcutHelp(!showShortcutHelp);
+  }, [showShortcutHelp, setShowShortcutHelp]);
+
+  const handleToggleSettings = useCallback(() => {
+    setShowSettings((prev) => !prev);
+  }, []);
+
+  const handleToggleTheme = useCallback(() => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  }, [theme, setTheme]);
+
+  // Register keyboard shortcuts
+  useKeyboardShortcuts(
+    DEFAULT_SHORTCUTS,
+    {
+      help: handleToggleHelp,
+      settings: handleToggleSettings,
+      'toggle-theme': handleToggleTheme,
+      // Navigation shortcuts
+      'focus-import': () => {
+        document.getElementById('import-heading')?.scrollIntoView({ behavior: 'smooth' });
+      },
+      'focus-sizes': () => {
+        document.getElementById('sizes-heading')?.scrollIntoView({ behavior: 'smooth' });
+      },
+      'focus-formats': () => {
+        document.getElementById('formats-heading')?.scrollIntoView({ behavior: 'smooth' });
+      },
+      'focus-output': () => {
+        document.getElementById('output-heading')?.scrollIntoView({ behavior: 'smooth' });
+      },
+    },
+    {
+      ignoreWhenTyping: true,
+      globalShortcuts: ['help'],
+    }
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -25,6 +71,15 @@ function App() {
 
           <div className="flex items-center gap-2">
             <ThemeToggle />
+
+            <button
+              onClick={() => setShowShortcutHelp(!showShortcutHelp)}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+              aria-label="Keyboard shortcuts"
+              title="Keyboard shortcuts (?)"
+            >
+              <Keyboard className="h-5 w-5" />
+            </button>
 
             <button
               onClick={() => setShowAbout(true)}
@@ -99,6 +154,9 @@ function App() {
       {showSettings && (
         <SettingsPanel onClose={() => setShowSettings(false)} showAbout={showAbout} />
       )}
+
+      {/* Keyboard Shortcuts Help */}
+      {showShortcutHelp && <ShortcutsHelp onClose={() => setShowShortcutHelp(false)} />}
 
       {/* Footer */}
       <footer className="mt-auto border-t py-6">
