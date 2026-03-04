@@ -9,7 +9,19 @@ pub async fn select_folder(app: tauri::AppHandle) -> Result<Option<String>, Stri
     app.dialog()
         .file()
         .pick_folder(move |folder| {
-            let _ = tx.send(folder.map(|p| p.to_string()));
+            if let Some(folder) = folder {
+                // Convert to path string
+                let path = folder.to_string();
+                // Remove file:// prefix if present
+                let clean_path = if path.starts_with("file://") {
+                    path.strip_prefix("file://").unwrap_or(&path).to_string()
+                } else {
+                    path
+                };
+                let _ = tx.send(Some(clean_path));
+            } else {
+                let _ = tx.send(None);
+            }
         });
 
     rx.recv().map_err(|e| e.to_string())
@@ -25,7 +37,15 @@ pub async fn select_files(app: tauri::AppHandle, _filters: Vec<String>) -> Resul
         .add_filter("Images", &["png", "jpg", "jpeg", "webp", "ico", "bmp", "gif", "tiff", "svg"])
         .pick_files(move |files| {
             if let Some(files) = files {
-                let paths: Vec<String> = files.iter().map(|f| f.to_string()).collect();
+                let paths: Vec<String> = files.iter().map(|f| {
+                    let path = f.to_string();
+                    // Remove file:// prefix if present
+                    if path.starts_with("file://") {
+                        path.strip_prefix("file://").unwrap_or(&path).to_string()
+                    } else {
+                        path
+                    }
+                }).collect();
                 let _ = tx.send(paths);
             } else {
                 let _ = tx.send(vec![]);

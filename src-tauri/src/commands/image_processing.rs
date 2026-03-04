@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use tauri::command;
-use image::{GenericImageView, ImageFormat};
+use image::{GenericImageView, ImageFormat, ImageReader};
 use std::path::{Path, Component};
 use tokio::task::spawn_blocking;
 
@@ -93,6 +93,7 @@ fn detect_format(path: &str) -> Option<ImageFormat> {
         "bmp" => Some(ImageFormat::Bmp),
         "gif" => Some(ImageFormat::Gif),
         "tiff" | "tif" => Some(ImageFormat::Tiff),
+        "ico" => Some(ImageFormat::Ico),
         _ => None,
     }
 }
@@ -106,7 +107,7 @@ fn get_output_format(format: &str) -> ImageFormat {
         "bmp" => ImageFormat::Bmp,
         "gif" => ImageFormat::Gif,
         "tiff" => ImageFormat::Tiff,
-        "ico" => ImageFormat::Png, // ICO handled separately
+        "ico" => ImageFormat::Ico,
         _ => ImageFormat::Png,
     }
 }
@@ -122,7 +123,15 @@ pub async fn get_image_metadata(path: String) -> Result<ImageMetadata, String> {
     let path_clone = path.clone();
     
     let metadata = spawn_blocking(move || {
-        let img = image::open(&path_clone).map_err(|e| e.to_string())?;
+        // Try to open as image
+        let img = match ImageReader::open(&path_clone) {
+            Ok(reader) => reader.with_guessed_format()
+                .map_err(|e| e.to_string())?
+                .decode()
+                .map_err(|e| e.to_string())?,
+            Err(e) => return Err(format!("Failed to open image: {}", e)),
+        };
+        
         let (width, height) = img.dimensions();
         
         let file_metadata = std::fs::metadata(&path_clone)
@@ -132,9 +141,9 @@ pub async fn get_image_metadata(path: String) -> Result<ImageMetadata, String> {
             .map(|f| format!("{:?}", f))
             .unwrap_or_else(|| "unknown".to_string());
         
-        let has_transparency = supports_transparency(
-            detect_format(&path_clone).unwrap_or(ImageFormat::Png)
-        );
+        let has_transparency = detect_format(&path_clone)
+            .map(|f| supports_transparency(f))
+            .unwrap_or(false);
 
         Ok::<ImageMetadata, String>(ImageMetadata {
             name: Path::new(&path_clone)
@@ -165,26 +174,24 @@ pub async fn convert_image(request: ConversionRequest) -> Result<ConversionResul
 
     let result = spawn_blocking(move || {
         // Open source image
-        let img = image::open(&source_path)
-            .map_err(|e| format!("Failed to open image: {}", e))?;
+        let img = match ImageReader::open(&source_path) {
+            Ok(reader) => reader.with_guessed_format()
+                .map_err(|e| format!("Failed to open image: {}", e))?
+                .decode()
+                .map_err(|e| format!("Failed to decode image: {}", e))?,
+            Err(e) => return Err(format!("Failed to open image file: {}", e)),
+        };
 
         // Resize if needed
-        let processed_img = if img.width() != options.target_width 
-            || img.height() != options.target_height 
-        {
-            if options.maintain_aspect_ratio {
-                img.resize_exact(
-                    options.target_width,
-                    options.target_height,
-                    image::imageops::FilterType::Lanczos3,
-                )
-            } else {
-                img.resize_exact(
-                    options.target_width,
-                    options.target_height,
-                    image::imageops::FilterType::Lanczos3,
-                )
-            }
+        let target_width = options.target_width.max(1);
+        let target_height = options.target_height.max(1);
+        
+        let processed_img = if img.width() != target_width || img.height() != target_height {
+            img.resize_exact(
+                target_width,
+                target_height,
+                image::imageops::FilterType::Lanczos3,
+            )
         } else {
             img
         };
@@ -202,23 +209,20 @@ pub async fn convert_image(request: ConversionRequest) -> Result<ConversionResul
             ImageFormat::Jpeg => {
                 // Convert to RGB if necessary (JPEG doesn't support alpha)
                 let rgb_img = processed_img.to_rgb8();
-                rgb_img.save_with_format(&output_path, ImageFormat::Jpeg)
-                    .map_err(|e| format!("Failed to save JPEG: {}", e))?;
+                let mut output_file = std::fs::File::create(&output_path)
+                    .map_err(|e| format!("Failed to create output file: {}", e))?;
+                let mut encoder = image::codecs::jpeg::JpegEncoder::new_with_quality(&mut output_file, options.quality.max(1).min(100) as u8);
+                encoder.encode(&rgb_img, target_width, target_height, image::ExtendedColorType::Rgb8)
+                    .map_err(|e| format!("Failed to encode JPEG: {}", e))?;
             }
-            ImageFormat::Png => {
-                processed_img.save_with_format(&output_path, ImageFormat::Png)
-                    .map_err(|e| format!("Failed to save PNG: {}", e))?;
-            }
-            ImageFormat::WebP => {
-                processed_img.save_with_format(&output_path, ImageFormat::WebP)
-                    .map_err(|e| format!("Failed to save WebP: {}", e))?;
-            }
-            ImageFormat::Bmp => {
-                processed_img.save_with_format(&output_path, ImageFormat::Bmp)
-                    .map_err(|e| format!("Failed to save BMP: {}", e))?;
+            ImageFormat::Ico => {
+                // For ICO, save as PNG first (ICO format is complex)
+                let png_path = output_path.replace(".ico", ".png");
+                processed_img.save_with_format(&png_path, ImageFormat::Png)
+                    .map_err(|e| format!("Failed to save ICO: {}", e))?;
             }
             _ => {
-                processed_img.save(&output_path)
+                processed_img.save_with_format(&output_path, output_format)
                     .map_err(|e| format!("Failed to save image: {}", e))?;
             }
         }
@@ -242,13 +246,13 @@ pub async fn convert_image(request: ConversionRequest) -> Result<ConversionResul
 /// Batch convert multiple images
 #[command]
 pub async fn batch_convert(request: BatchConversionRequest) -> Result<BatchConversionResult, String> {
+    // Create output directory first
+    std::fs::create_dir_all(&request.output_directory)
+        .map_err(|e| format!("Failed to create output directory: {}", e))?;
+
     let mut results = Vec::new();
     let mut successful = 0;
     let mut failed = 0;
-
-    // Create output directory
-    std::fs::create_dir_all(&request.output_directory)
-        .map_err(|e| format!("Failed to create output directory: {}", e))?;
 
     // Process each source image
     for source_path in &request.source_paths {
@@ -267,19 +271,26 @@ pub async fn batch_convert(request: BatchConversionRequest) -> Result<BatchConve
                 let sanitized_name = sanitize_filename(source_name);
 
                 // Generate output filename based on pattern
+                let file_ext = if format == "ico" { "png" } else { format };
                 let file_name = request.naming_pattern
                     .replace("{name}", &sanitized_name)
                     .replace("{size}", &size_str)
                     .replace("{format}", &sanitize_filename(format))
                     .replace("{width}", &width.to_string())
                     .replace("{height}", &height.to_string());
+                
+                let final_filename = if file_name.contains('.') {
+                    file_name
+                } else {
+                    format!("{}.{}", file_name, file_ext)
+                };
 
                 // Build output path based on organization
                 let output_path = match request.organization.as_str() {
-                    "by-size" => format!("{}/{}/{}", request.output_directory, size_str, file_name),
-                    "by-format" => format!("{}/{}/{}", request.output_directory, format, file_name),
-                    "by-size-and-format" => format!("{}/{}/{}/{}", request.output_directory, size_str, format, file_name),
-                    _ => format!("{}/{}", request.output_directory, file_name),
+                    "by-size" => format!("{}/{}/{}", request.output_directory, size_str, final_filename),
+                    "by-format" => format!("{}/{}/{}", request.output_directory, format, final_filename),
+                    "by-size-and-format" => format!("{}/{}/{}/{}", request.output_directory, size_str, format, final_filename),
+                    _ => format!("{}/{}", request.output_directory, final_filename),
                 };
 
                 // Validate output path doesn't escape output directory
