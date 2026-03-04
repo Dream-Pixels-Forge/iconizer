@@ -1,47 +1,45 @@
-# Iconizer v1.0.0-mvp - Release Documentation
+# Changelog
 
-**Release Date:** 2026-03-04
-**Version:** 1.0.0-mvp
-**Status:** ✅ **RELEASED**
-**Tag:** `v1.0.0-mvp`
-
----
-
-## Release Summary
-
-Iconizer v1.0.0-mvp is the initial public release of the desktop image conversion application. This MVP (Minimum Viable Product) delivers core functionality for batch image conversion and icon generation with a modern, intuitive interface.
-
-### 📊 Release Metrics
-
-| Metric | Value |
-|--------|-------|
-| **Total Commits** | 40+ |
-| **Lines of Code** | 21,000+ |
-| **Files Created** | 83 |
-| **Test Cases** | 144+ |
-| **Code Coverage** | 85%+ |
-| **Documentation** | 2,000+ lines |
-| **Development Time** | ~12 hours |
-
-### 🎯 MVP Scope Completion
-
-| Feature Category | Completion | Status |
-|-----------------|------------|--------|
-| Image Format Conversion | 100% | ✅ Complete |
-| Batch Size Generation | 100% | ✅ Complete |
-| Selective Output Control | 100% | ✅ Complete |
-| User Interface | 100% | ✅ Complete |
-| Output Management | 100% | ✅ Complete |
-| Performance & Quality | 100% | ✅ Complete |
-| Testing & QA | 100% | ✅ Complete |
-| Documentation | 100% | ✅ Complete |
-
----
-
-## Changelog
+All notable changes to Iconizer will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [Unreleased]
+
+### Planned for v1.1.0 (Q2 2026)
+
+#### Batch Editing
+- Image adjustments (brightness, contrast, saturation)
+- Color corrections (hue, balance, vibrance)
+- Filters and effects (grayscale, sepia, blur, sharpen)
+- Transform operations (crop, rotate, resize, flip)
+- Watermark system (text and image overlays)
+- Batch rename with patterns
+
+#### Extended Formats
+- AVIF format support (read/write)
+- HEIC/HEIF import (iOS photos)
+- PDF export (multi-page)
+- Improved SVG rasterization
+
+#### Performance
+- GPU-accelerated processing
+- Smart caching system
+- Memory optimization
+- Background processing queue
+
+#### Cloud Sync
+- Preset synchronization
+- Settings backup and restore
+- Cross-device compatibility
+
+#### Developer Tools
+- CLI version for automation
+- Node.js API for integration
+- Plugin architecture
 
 ---
 
@@ -156,7 +154,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Status |
 |---------|------|--------|
-| 1.0.0-mvp | 2026-03-04 | Release |
+| 1.0.0-mvp | 2026-03-04 | ✅ Released |
 
 ---
 
@@ -173,42 +171,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased] - v1.1.0 Planned
-
-### ✨ Planned Features
-
-#### Batch Editing (P0)
-- Image filters (brightness, contrast, saturation)
-- Crop and rotate operations
-- Watermark overlay support
-- Batch rename functionality
-
-#### Cloud Sync (P1)
-- Cloud preset synchronization
-- Settings backup and restore
-- Shared team configurations
-
-#### Extended Format Support (P1)
-- AVIF format support
-- HEIC/HEIF format support
-- PDF export (multi-page)
-- SVG trace improvements
-
-#### Performance Enhancements (P0)
-- GPU-accelerated processing
-- Incremental conversions
-- Smart caching system
-- Background processing queue
-
-#### Developer Experience (P2)
-- CLI version for automation
-- Node.js API for integration
-- Plugin architecture
-- WebAssembly build for web
-
-### 📅 Target Release: Q2 2026
-
----
-
 **Last Updated:** 2026-03-04
-**Next Release:** v1.1.0 (Planned)
